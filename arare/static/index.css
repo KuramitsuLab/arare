@@ -1,0 +1,48 @@
+/* index.css */
+@font-face {
+  font-family: "MyYuGothicM";
+  font-weight: normal;
+  src: local("YuGothic-Medium"),
+    local("Yu Gothic Medium"),
+    local("YuGothic-Regular");
+}
+@font-face {
+  font-family: "MyYuGothicM";
+  font-weight: bold;
+  src: local("YuGothic-Bold"),
+    local("Yu Gothic");
+}
+
+html {
+ font-family: /*-apple-system, BlinkMacSystemFont,*/ "Hiragino Kaku Gothic ProN", MyYuGothicM, Meiryo, sans-serif;
+}
+
+#left{
+    float: left;
+    width: calc(100vmin);
+    height: calc(100vmin);
+    //background-color: blue;
+    margin: 0 auto;
+}
+#right{
+    float: right;
+    width: calc(100vmin);
+    height: calc(100vmin);
+    //background-color: green;
+    margin: 0 auto;
+}
+
+#canvas{
+    position: center;
+    width: calc(100vmin - 10px);
+    height: calc(100vmin - 10px);
+    background-color: #FFCCFF;
+    margin: 0 auto;
+}
+#editor{
+    position: center;
+    width: calc(100vmin - 10px);
+    height: calc(100vmin - 10px);
+    //background-color: yellow;
+    margin: 0 auto;
+}
