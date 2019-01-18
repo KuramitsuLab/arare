@@ -17,5 +17,23 @@
             Arare.compile(editor.getValue());
         }, 400);
     });
+
+    /*
+    var resizeWindow = function() {
+      var cvsw = $( window ).width();
+      var cvsh = $( window ).height();
+    }
+
+    $(window).on('load', function(){
+        resizeWindow();
+    });
+
+    $(window).on('resize', function(){
+        resizeWindow();
+    });
+    */
+
     Arare.show(ArareCode);
+
+
 })()

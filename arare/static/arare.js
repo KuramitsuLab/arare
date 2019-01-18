@@ -9,7 +9,10 @@ var ArareCode = ArareCode || {
     world : {
         width: 1000,
         height: 1000,
+        background: "white",
         mouse: false,
+        debug: true,
+        autoPlay: true,
     },
     bodies : [
         {
@@ -26,36 +29,78 @@ var ArareCode = ArareCode || {
             y: 100,
             radius: 50,
             isStatic: true,
-            image: "/image/logo.png"
+            angularSpeed: 1.0,
+            texture: "/static/image/logo.png"
+        },
+        {
+            type: "rectangle",
+            name: "C",
+            x: 0,
+            y: 300,
+            width:300,
+            height:20,
+            isStatic: true,
+            fillStyle: 'green',
+        },
+        {
+            type: "rectangle",
+            name: "C",
+            x: 0,
+            y: 980,
+            width:1000,
+            height:20,
+            isStatic: true,
+            fillStyle: 'black',
         },
     ],
 }
 
 /* 物体属性 */
 
+Arare.ATTRLIST = [
+  "angle",//角度（ラジアン）
+  "angularSpeed",//角速度
+  "angularVelocity",//角速度
+  "area",//面積
+  "axes",//衝突検出のために使用される一意の軸ベクトル
+  "bounds",//境界
+  "density",//密度
+  "force",//フォース（ベクトル）
+  "friction",//摩擦
+  "frictionAir",//空気抵抗
+  "inertia",//慣性
+  "inverseInertia",//慣性逆モーメント
+  "inverseMass",//逆質量
+  "isSleeping",//スリープ中か
+  "isStatic",//静的か
+  "label",//剛体のラベル
+  "mass",//質量
+  "motion",//運動量
+  "position",//位置 { x: 0, y: 0 }
+  "restitution",//弾力性
+  "sleepThreshold",//スリープのしきい値
+  "speed",//速度（スカラー）
+  "timeScale",//タイムスケール
+  "torque",//回転力
+  //"type",//オブジェクトの型
+  "velocity",//速度（ベクトル）
+  "vertices",//剛体の頂点
+];
+
 Arare.bodyData = function(vars, data) {
   var o = {};
-  if (data.parent && vars[data.parent] ) {
-    Arare.copyAttr(vars[data.parent], o,
-      ["isStatic",
-      "density", "frictionAir", "restitution", "friction",
-      "render"]
-    );
-  }
-  Arare.copyAttr(data, o,
-    ["isStatic", "density", "frictionAir", "restitution", "friction"]);
   if(data.image) {
-    o.render = {
-      sprite: {
-          texture: data.image
-      }
-    };
-    if(data.strokeStyle) {
-      o.rander.sprite.strokeStyle = data.strokeStyle;
-    }
+    data.texture = data.image;
   }
+  if (data.parent && vars[data.parent] ) {
+    Arare.copyAttr(vars[data.parent], o, Arare.ATTRLIST);
+  }
+  Arare.copyAttr(data, o, Arare.ATTRLIST);
+  Arare.copyRender(data, o, ["fillStyle"]);
+  Arare.copySprite(data, o, ["texture", "strokeStyle", "xScale", "yScale"]);
   return o;
 }
+
 
 Arare.copyAttr = function(src, dst, fields) {
   for (var f of fields) {
@@ -63,7 +108,25 @@ Arare.copyAttr = function(src, dst, fields) {
         dst[f] = src[f];
       }
   }
-  console.log(dst);
+}
+
+Arare.copyRender = function(src, dst, fields) {
+  for (var f of fields) {
+      if(src[f]) {
+        dst.render = dst.render || {};
+        dst.render[f] = src[f];
+      }
+  }
+}
+
+Arare.copySprite = function(src, dst, fields) {
+  for (var f of fields) {
+      if(src[f]) {
+        dst.render = dst.render || {};
+        dst.render.sprite = dst.render.sprite || {};
+        dst.render.sprite[f] = src[f];
+      }
+  }
 }
 
 /* 物体を作る */
@@ -83,9 +146,7 @@ Arare.newbodyFunc["rectangle"] = function(vars, data) {
 }
 
 Arare.newbodyFunc["unknown"] = function(vars, data) {
-    /* TODO */
     var options = {
-        /* オプション */
     }
     return function(x, y) {
         return Matter.Bodies.circle(x, y, data.radius, options);
@@ -143,11 +204,14 @@ Arare.init = function(world) {
         engine: engine,
         options: {
             /* オブジェクトが枠線のみになる */
-            wireframes: world.debug || false,
-            width: world.width   || 1000,
-            height: world.height || 1000,
+            wireframes: false,
+            width: $('#right').width() || 500,
+            height: $('#right').height() || 500,
             background: world.background || 'rgba(0, 0, 0, 0)',
-            showPositions: true,
+            showDebug: world.debug || false,
+            showPositions: world.debug || false,
+            showMousePositions: world.debug || false,
+            debugString: "hoge\nこまったなあ",
         },
     });
 
@@ -155,7 +219,7 @@ Arare.init = function(world) {
    Matter.Render.lookAt(render, {
        min: {x: 0, y: 0},
        max: {
-           x: world.height || 1000,
+           x: world.width || 1000,
            y: world.height || 1000
        }
    });
@@ -215,7 +279,7 @@ Arare.ready = function(ctx) {
     Matter.Runner.run(ctx.runner, ctx.engine); / *物理エンジンを動かす * /
     /* 描画開始 */
     Matter.Render.run(ctx.render);
-    //runner.enabled = false; / *初期位置を描画したら一度止める * /
+    runner.enabled = false; / *初期位置を描画したら一度止める * /
 }
 
 Arare.start = function(ctx) {
@@ -262,6 +326,9 @@ Arare.show = function(code) {
     }
     Arare.ready(context);
     Arare.context = context;
+    if(code.world.autoPlay) {
+      Arare.start(context);
+    }
 }
 
 /* コンパイル */
