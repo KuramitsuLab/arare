@@ -1,6 +1,8 @@
 // arare
 
 var Arare = {
+    width: 500,
+    height: 500,
     newbodyFunc: {}, /* 物体作成の関数 */
     context: {},
 }
@@ -10,7 +12,6 @@ var ArareCode = ArareCode || {
         width: 1000,
         height: 1000,
         background: "white",
-        mouse: false,
         debug: true,
         autoPlay: true,
     },
@@ -21,16 +22,17 @@ var ArareCode = ArareCode || {
             x : 100,
             y : 100,
             radius: 50,
+            text: 12,
         },
         {
-            type: "circle",
+            type: "pendulum",
             name: "B",
-            x: 300,
-            y: 100,
+            x: 400,
+            y: 400,
             radius: 50,
             isStatic: true,
             angularSpeed: 1.0,
-            texture: "/static/image/logo.png"
+            //texture: "/static/image/logo.png"
         },
         {
             type: "rectangle",
@@ -96,11 +98,10 @@ Arare.bodyData = function(vars, data) {
     Arare.copyAttr(vars[data.parent], o, Arare.ATTRLIST);
   }
   Arare.copyAttr(data, o, Arare.ATTRLIST);
-  Arare.copyRender(data, o, ["fillStyle"]);
+  Arare.copyRender(data, o, ["fillStyle", "strokeStyle", "lineStyle", "opacity", "text", "font", "textStyle"]);
   Arare.copySprite(data, o, ["texture", "strokeStyle", "xScale", "yScale"]);
   return o;
 }
-
 
 Arare.copyAttr = function(src, dst, fields) {
   for (var f of fields) {
@@ -142,6 +143,13 @@ Arare.newbodyFunc["rectangle"] = function(vars, data) {
     var options = Arare.bodyData(vars, data);
     return function(x, y) {
         return Matter.Bodies.rectangle(x, y, data.width, data.height, options);
+    }
+}
+
+Arare.newbodyFunc["pendulum"] = function(vars, data) {
+    var options = Arare.bodyData(vars, data);
+    return function(x, y) {
+        return Matter.Composites.newtonsCradle(x, y, options.columns || 1, options.radius || 80, options.length || 240);
     }
 }
 
@@ -187,10 +195,6 @@ Arare.init = function(world) {
     // create an engine
     var engine = Matter.Engine.create();
 
-    / * 重力 ここでいいのか? */
-    engine.world.gravity.x = world.gravityX || 0;
-    engine.world.gravity.y = world.gravityY || 0;
-
     /* engineのアクティブ、非アクティブの制御を行う */
     var runner = Matter.Runner.create();
 
@@ -199,21 +203,27 @@ Arare.init = function(world) {
 
     // レンダーオプション
 
+    if(Arare.canvas) {
+        Arare.canvas.parentElement.removeChild(Arare.canvas);
+    }
+
     var render = Matter.Render.create({
+        /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
         element: document.getElementById("canvas"),
         engine: engine,
         options: {
             /* オブジェクトが枠線のみになる */
-            wireframes: false,
-            width: $('#right').width() || 500,
-            height: $('#right').height() || 500,
+            width: Arare.width,
+            height: Arare.height,
             background: world.background || 'rgba(0, 0, 0, 0)',
+            wireframes: false,
             showDebug: world.debug || false,
             showPositions: world.debug || false,
             showMousePositions: world.debug || false,
             debugString: "hoge\nこまったなあ",
         },
     });
+    Arare.canvas = render.canvas;
 
     / *リサイズ * /
    Matter.Render.lookAt(render, {
@@ -225,7 +235,7 @@ Arare.init = function(world) {
    });
 
    /* マウス */
-   if(world.mouse) {
+   if(world.mouse || true) {
      var mouse = Matter.Mouse.create(render.canvas);
      var mouseConstraint = Matter.MouseConstraint.create(engine, {
            mouse: mouse,
@@ -236,11 +246,13 @@ Arare.init = function(world) {
                }
            }
        });
+
        Matter.World.add(engine.world, mouseConstraint);
        // keep the mouse in sync with rendering
        render.mouse = mouse;
 
        // an example of using mouse events on a mouse
+       /*
       Matter.Events.on(mouseConstraint, 'mousedown', function(event) {
           var mousePosition = event.mouse.position;
           console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
@@ -262,8 +274,13 @@ Arare.init = function(world) {
       Matter.Events.on(mouseConstraint, 'enddrag', function(event) {
           console.log('enddrag', event);
       });
+      */
 
      }
+
+     / * 重力 ここでいいのか? */
+     engine.world.gravity.x = world.gravityX || 0;
+     engine.world.gravity.y = world.gravityY || 0;
 
     return {
         engine: engine,
@@ -279,7 +296,7 @@ Arare.ready = function(ctx) {
     Matter.Runner.run(ctx.runner, ctx.engine); / *物理エンジンを動かす * /
     /* 描画開始 */
     Matter.Render.run(ctx.render);
-    runner.enabled = false; / *初期位置を描画したら一度止める * /
+    ctx.runner.enabled = false; / *初期位置を描画したら一度止める * /
 }
 
 Arare.start = function(ctx) {
@@ -295,25 +312,22 @@ Arare.pause = function(ctx) {
 
 Arare.reset = function(ctx) {
     if(ctx.runner) {
-        Matter.Runner.stop(arare.runner);
-        arare.runner = null;
+        Matter.Runner.stop(ctx.runner);
+        ctx.runner = null;
     }
     if(ctx.engine) {
-        Matter.World.clear(arare.engine.world);
-        Matter.Engine.clear(arare.engine);
-        arare.engine = null;
+        Matter.World.clear(ctx.engine.world);
+        Matter.Engine.clear(ctx.engine);
+        ctx.engine = null;
     }
     if(ctx.render) {
-        var render = arare.render;
+        var render = ctx.render;
         Matter.Render.stop(render);
         // render.canvas.remove();
         render.canvas = null;
         render.context = null;
-        render.textures = {};
+        //render.textures = {};
     }
-
-    //textContext.clearRect(0, 0, cvsw, cvsh);
-    //$('#text-canvas').css("background-color", 'black');
 }
 
 Arare.show = function(code) {
@@ -349,3 +363,107 @@ Arare.compile = function(inputs) {
         console.log("errorThrown    : " + errorThrown.message);
     })
 }
+
+/* Renderer */
+
+/**
+     * Description
+     * @private
+     * @method bodies
+     * @param {render} render
+     * @param {body[]} bodies
+     * @param {RenderingContext} context
+     */
+
+Matter.Render.bodies = function(render, bodies, context) {
+  var c = context,
+      engine = render.engine,
+      options = render.options,
+      showInternalEdges = options.showInternalEdges || !options.wireframes,
+      body,part,i,k;
+
+  for (i = 0; i < bodies.length; i++) {
+      body = bodies[i];
+      if (!body.render.visible)
+          continue;
+
+      // handle compound parts
+      for (k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k++) {
+          part = body.parts[k];
+
+          if (!part.render.visible)
+              continue;
+
+          if (options.showSleeping && body.isSleeping) {
+              c.globalAlpha = 0.5 * part.render.opacity;
+          } else if (part.render.opacity !== 1) {
+              c.globalAlpha = part.render.opacity;
+          }
+
+          if (part.render.sprite && part.render.sprite.texture && !options.wireframes) {
+              // part sprite
+              var sprite = part.render.sprite,
+                  texture = _getTexture(render, sprite.texture);
+
+              c.translate(part.position.x, part.position.y);
+              c.rotate(part.angle);
+
+              c.drawImage(
+                  texture,
+                  texture.width * -sprite.xOffset * sprite.xScale,
+                  texture.height * -sprite.yOffset * sprite.yScale,
+                  texture.width * sprite.xScale,
+                  texture.height * sprite.yScale
+              );
+
+              // revert translation, hopefully faster than save / restore
+              c.rotate(-part.angle);
+              c.translate(-part.position.x, -part.position.y);
+          } else {
+              // part polygon
+              if (part.circleRadius) {
+                  c.beginPath();
+                  c.arc(part.position.x, part.position.y, part.circleRadius, 0, 2 * Math.PI);
+              } else {
+                  c.beginPath();
+                  c.moveTo(part.vertices[0].x, part.vertices[0].y);
+
+                  for (var j = 1; j < part.vertices.length; j++) {
+                      if (!part.vertices[j - 1].isInternal || showInternalEdges) {
+                          c.lineTo(part.vertices[j].x, part.vertices[j].y);
+                      } else {
+                          c.moveTo(part.vertices[j].x, part.vertices[j].y);
+                      }
+
+                      if (part.vertices[j].isInternal && !showInternalEdges) {
+                          c.moveTo(part.vertices[(j + 1) % part.vertices.length].x, part.vertices[(j + 1) % part.vertices.length].y);
+                      }
+                  }
+
+                  c.lineTo(part.vertices[0].x, part.vertices[0].y);
+                  c.closePath();
+              }
+
+              if (!options.wireframes) {
+                  c.fillStyle = part.render.fillStyle;
+                  if (part.render.lineWidth) {
+                      c.lineWidth = part.render.lineWidth;
+                      c.strokeStyle = part.render.strokeStyle;
+                      c.stroke();
+                  }
+                  c.fill();
+              } else {
+                  c.lineWidth = 3;
+                  c.strokeStyle = '#bbb';
+                  c.stroke();
+              }
+              if(part.render.text) {
+                c.font = part.render.font || "24px Arial";
+                c.fillStyle = part.render.textStyle || 'rgba(255,0,127,0.5)';
+                c.fillText("" + part.render.text, part.position.x, part.position.y);
+              }
+          }
+          c.globalAlpha = 1;
+      }
+  }
+};
