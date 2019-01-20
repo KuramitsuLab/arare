@@ -21,20 +21,48 @@
         }, 400);
     });
 
+    var fullscreen = false;
+    function getFullscreen() {
+    	if (document.webkitFullscreenElement) {
+    		return document.webkitFullscreenElement;
+    	} else if (document.mozFullScreenElement) {
+    		return document.mozFullScreenElement;
+    	} else if (document.msFullscreenElement) {
+    		return document.msFullscreenElement;
+    	} else if (document.fullscreenElement) {
+    		return document.fullscreenElement;
+    	}
+    }
+
     function resizeMe() {
       var w = $( window ).width();
       var h = $( window ).height();
-      if(w <= 800) {
-        Arare.width = w * 0.95;
-        Arare.height = w * 0.95;
+      console.log('resizeMe', w, h, fullscreen, getFullscreen());
+      if(getFullscreen() != null) {
+        fullscreen = true;
       }
-      else {
-        var min = Math.min(w/2, h);
+      if (fullscreen) {
+        var min = Math.min(w, h);
         Arare.width  =min;
         Arare.height =min;
+        fullscreen = false;
       }
-      $('#canvas').get(0).width = Arare.width;
-      $('#canvas').get(0).width = Arare.height;
+      else {
+        if(w <= 800) {
+          Arare.width = w;
+          Arare.height = w;
+        }
+        else {
+          var min = Math.min(w/2, h);
+          Arare.width  = min;
+          Arare.height = min;
+        }
+      }
+
+      if(Arare.canvas) {
+        Arare.canvas.setAttribute('width', Arare.width);
+        Arare.canvas.setAttribute('height', Arare.height);
+      }
 
       if(Arare.context) {
         var render = Arare.context.render;
@@ -110,6 +138,7 @@
     		return;
     	}
     }
+
     function exitFullscreen() {
     	if (document.webkitCancelFullScreen) {
     		document.webkitCancelFullScreen(); //Chrome15+, Safari5.1+, Opera15+
@@ -123,6 +152,25 @@
     		document.exitFullscreen(); // HTML5 Fullscreen API仕様
     	}
     }
+
+    document.onkeydown = function(evt) {
+      evt = evt || window.event;
+      var isEscape = false;
+      if ("key" in evt) {
+          isEscape = (evt.key == "Escape" || evt.key == "Esc");
+      } else {
+          isEscape = (evt.keyCode == 27);
+      }
+      if (isEscape) {
+          exitFullscreen();
+      }
+    };
+
+    $('#extend').on("click", function() {
+      if(Arare.canvas) {
+        requestFullscreen(Arare.canvas);
+      }
+    });
 
     Arare.show(ArareCode);
 
