@@ -300,13 +300,12 @@ Arare.ready = function(ctx) {
 }
 
 Arare.start = function(ctx) {
-    console.log("start");
+    //console.log("start");
     ctx.runner.enabled = true;
 }
 
 Arare.pause = function(ctx) {
-    console.log("pause");
-    /* engineを止める */
+    //console.log("pause");
     ctx.runner.enabled = false;
 }
 

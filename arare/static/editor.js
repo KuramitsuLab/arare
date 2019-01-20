@@ -98,17 +98,24 @@
     $('#debug').on("click", function() {
       if(Arare.debug) {
         var render = Arare.context.render;
+        render.options.wireframes = false;
         render.options.showPositions = false;
         render.options.showMousePositions = false;
-        render.options.wireframes = false;
+        render.options.showVelocity = false;
+        render.options.showAngleIndicator = false;
+        render.options.showPositions = false;
+        render.options.showBounds = false;
         render.options.background = background;
         Arare.debug = false;
       }
       else {
         var render = Arare.context.render;
+        render.options.wireframes = true;
         render.options.showPositions = true;
         render.options.showMousePositions = true;
-        render.options.wireframes = true;
+        render.options.showVelocity = true;
+        render.options.showAngleIndicator = true;
+        render.options.showPositions = true;
         background = render.options.background;
         render.options.background = 'rgba(0, 0, 0, 0)';
         Arare.debug = true;
