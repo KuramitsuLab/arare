@@ -1,9 +1,14 @@
-
+var $ = require('jquery');
+var arare = require('./arare');
+var ace = require('../node_modules/ace-builds/src-min-noconflict/ace.js');
+var solarized_light = require('../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js');
+var Arare = arare.Arare;
+var ArareCode = arare.ArareCode;
 /* editor */
 
 (function(){
   var editor = ace.edit("editor");
-  editor.setTheme("ace/theme/solarized_light");
+  editor.setTheme(solarized_light);
   editor.getSession().setUseWrapMode(true);/* 折り返しあり */
   //editor.setFontSize(24);
 

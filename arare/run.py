@@ -3,12 +3,20 @@
 #
 #
 
-from flask import Flask, render_template
-app = Flask(__name__)
+from flask import Flask, render_template, send_file
+app = Flask(__name__, template_folder='front/static')
 
 @app.route('/')
 def index():
 	return render_template('index.html')
+
+@app.route('/index.css')
+def css():
+	return send_file('front/static/index.css')
+
+@app.route('/<path:d>')
+def dist(d):
+	return render_template(d)
 
 if __name__ == '__main__':
 	app.debug = True

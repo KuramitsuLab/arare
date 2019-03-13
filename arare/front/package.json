@@ -1,0 +1,20 @@
+{
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch --devtool source-map"
+  },
+  "devDependencies": {
+    "ts-loader": "^4.5.0",
+    "typescript": "^3.0.1",
+    "webpack": "^4.16.3",
+    "webpack-cli": "^3.1.0"
+  },
+  "private": true,
+  "dependencies": {
+    "@types/ace": "0.0.42",
+    "ace-builds": "^1.4.3",
+    "install": "^0.12.2",
+    "jquery": "^3.3.1",
+    "matter-js": "^0.14.2"
+  }
+}
