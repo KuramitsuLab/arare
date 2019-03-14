@@ -2,7 +2,7 @@ var $ = require('jquery');
 var arare = require('./arare');
 var ace = require('../node_modules/ace-builds/src-min-noconflict/ace.js');
 var solarized_light = require('../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js');
-var Arare = arare.Arare;
+var Arare = arare.arare;
 var ArareCode = arare.ArareCode;
 /* editor */
 
