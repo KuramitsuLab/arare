@@ -75,10 +75,11 @@ type Context = {
 
 export class Arare{
 
-    private width: number;
-    private height: number;
-    private canvas: HTMLCanvasElement | null;
-    private context: Context;
+    public width: number;
+    public height: number;
+    public canvas: HTMLCanvasElement | null;
+    public context: Context;
+    public debug: boolean
 
     /* 物体属性 */
     static ATTRLIST = [
@@ -122,6 +123,7 @@ export class Arare{
             vars: null,
             newbodyFunc: {} 
         }
+        this.debug = false
     }
 
     public static copyAttr(src, dst, fields) {
