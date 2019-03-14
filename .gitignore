@@ -105,11 +105,6 @@ venv.bak/
 
 #nodemodule
 arare/front/node_modules/*
-!arare/front/node_modules/@types
-arare/front/node_modules/@types/*
-!arare/front/node_modules/@types/matter-js
-arare/front/node_modules/@types/matter-js/*
-!arare/front/node_modules/@types/matter-js/index.d.ts
 
 #main js files
 arare/front/static/js/main.js

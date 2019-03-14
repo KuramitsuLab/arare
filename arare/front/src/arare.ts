@@ -184,7 +184,7 @@ export class Arare{
         "pendulum": (vars, data) => {
             var options = Arare.bodyData(vars, data);
             return (x, y) => {
-                return Matter.Composites.newtonsCradle(x, y, options['columns'] || 1, options['radius'] || 80, options['length'] || 240);
+                return Matter.Composites['newtonsCradle'](x, y, options['columns'] || 1, options['radius'] || 80, options['length'] || 240);
             }
         },
         "unknown": (_, data) => {
@@ -242,8 +242,8 @@ export class Arare{
             this.canvas.parentElement.removeChild(this.canvas);
         }
 
-        var render = Matter.Render.create({
-          /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
+        var renderOptions = {
+            /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
             element: document.getElementById("canvas"),
             engine: engine,
             options: {
@@ -257,26 +257,29 @@ export class Arare{
                 //showMousePositions: world.debug || false,
                 //debugString: "hoge\nこまったなあ",
             },
-        });
+        }
+
+        var render = Matter.Render.create(renderOptions);
         this.canvas = render.canvas;
 
         /* マウス */
         if (world.mouse || true) {
             var mouse = Matter.Mouse.create(render.canvas);
-            var mouseConstraint = Matter.MouseConstraint.create(engine, {
-            mouse: mouse,
-            constraint: Matter.Constraint.create({
+            var constraintOptions = {
                 pointA: { x: 0, y: 0 },
                 pointB: { x: 0, y: 0 },
                 stiffness: world.mouseStiffness || 0.2,  /* 剛性 */
-                render: {
-                    visible: world.mouseVisible || false
-                }
-            })
+            };
+            constraintOptions['render'] = {
+                visible: world.mouseVisible || false
+            };
+            var mouseConstraint = Matter.MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: Matter.Constraint.create(constraintOptions)
         });
 
         / *リサイズ * /
-        Matter.Render.lookAt(render, {
+        Matter.Render['lookAt'](render, {
             min: { x: 0, y: 0 },
             max: {
                 x: world.width || 1000,
@@ -285,7 +288,7 @@ export class Arare{
         });
 
         Matter.World.add(engine.world, mouseConstraint);
-        render.mouse = mouse;
+        render['mouse'] = mouse;
     
         // an example of using mouse events on a mouse
         /*
