@@ -404,8 +404,6 @@ export class Arare{
     }
 }
 
-export let arare: Arare = new Arare(500, 500);
-
 /*
 Matter.Render.bodies = function (render, bodies, context) {
     var c = context,
