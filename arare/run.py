@@ -18,5 +18,8 @@ def css():
 def dist(d):
 	return render_template(d)
 
-if __name__ == '__main__':
+def main():
 	app.run(host='0.0.0.0', port=8080, debug=True)
+
+if __name__ == '__main__':
+	main()
