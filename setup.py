@@ -10,7 +10,7 @@ setup(
     install_requires = ['setuptools', 'flask'],
  	packages = ['arare', 'arare/front'],
  	package_data = {'arare/front': ['*.json', '*.js', 'src/*.ts',
-        'static/audio/*.mp3', 'static/image/*.png', 'static/js/*', 'static/*'],},
+        'static/audio/*.mp3', 'static/image/*.png', 'static/js/*.js', 'static/*'],},
  	entry_points = {
  		'console_scripts': [
  			'arare = arare.run:main'
