@@ -27,14 +27,25 @@ html {
 
 .flex-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .flex-item {
-  flex: 0 0 50%;
-  max-width: 50%; /* IE11バグ対応 */
+  flex: 0 0 48%;
+  max-width: 48%; /* IE11バグ対応 */
   background-color: #FFEEFF;
   text-align: center;
+}
+
+.flex-sub{
+  flex: 0 0 4%;
+  max-width: 4%;
+  background-color: white;
+}
+
+.flex-button{
+  display: flex;
+  flex-direction: column;
 }
 
 #canvas{
@@ -47,12 +58,13 @@ html {
 #editor{
     position: center;
     width: 100%;
-    height: calc(100vw/2);
+    height: 100%;
     font-size: calc(100vw / 45);
     text-align: left;
     /*background-color: #FFCCFF;*/
     margin: 0 auto;
 }
+
 
 @media (max-width: 800px) {
   .flex-item {
@@ -71,11 +83,12 @@ html {
       position: center;
       width: 95%;
       height: 300px;
-      /*background-color: #FFCCFF;*/
+      background-color: #FFCCFF;
       font-size: calc(100vw / 45);
       text-align: left;
       margin: 0 auto;
-  }
+  } 
+  
 }
 
 #canvas:-webkit-full-screen{
@@ -119,7 +132,6 @@ svg {
 .i-large,
 .i-medium,
 .i-small { max-width: 50em; margin: 0 auto 2em }
-
 
 
 

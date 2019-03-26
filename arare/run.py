@@ -14,22 +14,38 @@ app = Flask(__name__, template_folder='front/static')
 def index():
 	return render_template('index.html')
 
-@app.route('/index.css')
-def css():
-	return send_file('front/static/index.css')
-
 @app.route('/<path:d>')
 def dist(d):
-	return render_template(d)
+	return send_file(f'front/static/{d}')
+
+
+def send_static_file(path1, path2):
+  return send_file(f'front/static/{path1}/{path2}')
+
+
+@app.route('/audio/<path:d>')
+def audio_dist(d):
+  return send_static_file('audio', d)
+
+
+@app.route('/image/<path:d>')
+def image_dist(d):
+  return send_static_file('image', d)
+
+
+@app.route('/js/<path:d>')
+def js_dist(d):
+  return send_static_file('js', d)
+
 
 @app.route('/compile', methods=['POST'])
 def transcompile():
-    inputText = request.form['source']
-    if '(ArareCode)' in inputText:
-            code = inputText
-    else:
-            code = compile(inputText)
-    return Response(code, mimetype='application/javascript')
+  inputText = request.form['source']
+  if '(ArareCode)' in inputText:
+    code = inputText
+  else:
+    code = compile(inputText)
+  return Response(code, mimetype='application/javascript')
 
 def main():
 	app.run(host='0.0.0.0', port=8080, debug=True)
