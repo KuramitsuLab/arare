@@ -11,8 +11,7 @@ type World = {
     gravityX?: number,
     gravityY?: number,
     mouseStiffness?: number,
-    mouseVisible?: boolean
-
+    mouseVisible?: boolean,
 };
 
 export let ArareCode = {
@@ -73,13 +72,12 @@ type Context = {
     newbodyFunc?: {[key: string]: any} 
 }
 
-export class Arare{
-
+export class Arare {
     public width: number;
     public height: number;
     public canvas: HTMLCanvasElement | null;
     public context: Context;
-    public debug: boolean
+    public debug: boolean;
 
     /* 物体属性 */
     static ATTRLIST = [

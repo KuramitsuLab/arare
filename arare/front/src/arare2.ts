@@ -8,10 +8,6 @@ type Code = {
     shapeFuncMap?: {[key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any }
 }
 
-function succ(n: number):number {
-    return n+1;
-}
-
 //(Arare2, {}) -> (number, number, number) -> any
 
 let shapeFuncMap : {[key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any } = {
