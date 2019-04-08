@@ -20960,15 +20960,272 @@ module.exports = function(module) {
 
 /***/ }),
 
-/***/ "./src/arare.ts":
-/*!**********************!*\
-  !*** ./src/arare.ts ***!
-  \**********************/
-/*! exports provided: ArareCode, Arare */
+/***/ "./src/arare2-code.ts":
+/*!****************************!*\
+  !*** ./src/arare2-code.ts ***!
+  \****************************/
+/*! exports provided: ArareCode */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"ArareCode\", function() { return ArareCode; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Arare\", function() { return Arare; });\n/* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! matter-js */ \"./node_modules/matter-js/build/matter.js\");\n/* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(matter_js__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! jquery */ \"./node_modules/jquery/dist/jquery.js\");\n/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_1__);\n\n\nvar ArareCode = {\n    world: {\n        width: 1000,\n        height: 1000,\n        background: \"white\",\n        debug: true,\n        autoPlay: true,\n    },\n    bodies: [\n        {\n            type: \"circle\",\n            name: \"A\",\n            x: 100,\n            y: 100,\n            radius: 50,\n            text: 12,\n        },\n        {\n            type: \"pendulum\",\n            name: \"B\",\n            x: 400,\n            y: 400,\n            radius: 50,\n            isStatic: true,\n            angularSpeed: 1.0,\n        },\n        {\n            type: \"rectangle\",\n            name: \"C\",\n            x: 0,\n            y: 300,\n            width: 300,\n            height: 20,\n            isStatic: true,\n            fillStyle: 'green',\n        },\n        {\n            type: \"rectangle\",\n            name: \"C\",\n            x: 0,\n            y: 980,\n            width: 1000,\n            height: 20,\n            isStatic: true,\n            fillStyle: 'black',\n        },\n    ],\n};\nvar Arare = /** @class */ (function () {\n    function Arare(width, height) {\n        this.width = width;\n        this.height = height;\n        this.canvas = null;\n        this.context = {\n            runner: null,\n            engine: null,\n            render: null,\n            vars: null,\n            newbodyFunc: {}\n        };\n        this.debug = false;\n    }\n    Arare.copyAttr = function (src, dst, fields) {\n        for (var _i = 0, fields_1 = fields; _i < fields_1.length; _i++) {\n            var f = fields_1[_i];\n            if (src[f]) {\n                dst[f] = src[f];\n            }\n        }\n    };\n    Arare.copyRender = function (src, dst, fields) {\n        for (var _i = 0, fields_2 = fields; _i < fields_2.length; _i++) {\n            var f = fields_2[_i];\n            if (src[f]) {\n                dst.render = dst.render || {};\n                dst.render[f] = src[f];\n            }\n        }\n    };\n    Arare.copySprite = function (src, dst, fields) {\n        for (var _i = 0, fields_3 = fields; _i < fields_3.length; _i++) {\n            var f = fields_3[_i];\n            if (src[f]) {\n                dst.render = dst.render || {};\n                dst.render.sprite = dst.render.sprite || {};\n                dst.render.sprite[f] = src[f];\n            }\n        }\n    };\n    Arare.bodyData = function (vars, data) {\n        var o = {};\n        if (data.image) {\n            data.texture = data.image;\n        }\n        if (data.parent && vars[data.parent]) {\n            Arare.copyAttr(vars[data.parent], o, Arare.ATTRLIST);\n        }\n        Arare.copyAttr(data, o, Arare.ATTRLIST);\n        Arare.copyRender(data, o, [\"fillStyle\", \"strokeStyle\", \"lineStyle\", \"opacity\", \"text\", \"font\", \"textStyle\"]);\n        Arare.copySprite(data, o, [\"texture\", \"strokeStyle\", \"xScale\", \"yScale\"]);\n        return o;\n    };\n    Arare.newbody = function (ctx, data) {\n        var vars = ctx.vars;\n        var newbodyFunc = Arare.newbodyFunc[\"unknown\"](vars, data);\n        var type = data.type || \"unknown\";\n        if (ctx.newbodyFunc[type]) {\n            newbodyFunc = ctx.newbodyFunc[type](vars, data);\n        }\n        else if (Arare.newbodyFunc[type]) {\n            newbodyFunc = Arare.newbodyFunc[type](vars, data);\n        }\n        var body = newbodyFunc(data.x, data.y);\n        if (data.name) {\n            vars[name] = body;\n        }\n        console.log(body);\n        return body;\n    };\n    /* 物体を登録する */\n    Arare.loadBodies = function (ctx, datalist) {\n        datalist = typeof datalist == 'undefined' ? [] : datalist;\n        var bodies = [];\n        for (var _i = 0, datalist_1 = datalist; _i < datalist_1.length; _i++) {\n            var data = datalist_1[_i];\n            bodies.push(Arare.newbody(ctx, data));\n        }\n        matter_js__WEBPACK_IMPORTED_MODULE_0__[\"World\"].add(ctx.engine.world, bodies);\n    };\n    Arare.prototype.init = function (world) {\n        world = typeof world == 'undefined' ? {} : world;\n        // create an engine\n        var engine = matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Engine\"].create();\n        /* engineのアクティブ、非アクティブの制御を行う */\n        var runner = matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Runner\"].create({});\n        /* worldに追加 */\n        // World.add(engine.world, Object.values(objectMap));\n        // レンダーオプション\n        if (this.canvas) {\n            this.canvas.parentElement.removeChild(this.canvas);\n        }\n        var renderOptions = {\n            /* Matter.js の変な仕様 canvas に新しい canvas が追加される */\n            element: document.getElementById(\"canvas\"),\n            engine: engine,\n            options: {\n                /* オブジェクトが枠線のみになる */\n                width: this.width,\n                height: this.height,\n                background: world.background || 'rgba(0, 0, 0, 0)',\n                wireframes: false,\n            },\n        };\n        var render = matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Render\"].create(renderOptions);\n        this.canvas = render.canvas;\n        /* マウス */\n        if (world.mouse || true) {\n            var mouse = matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Mouse\"].create(render.canvas);\n            var constraintOptions = {\n                pointA: { x: 0, y: 0 },\n                pointB: { x: 0, y: 0 },\n                stiffness: world.mouseStiffness || 0.2,\n            };\n            constraintOptions['render'] = {\n                visible: world.mouseVisible || false\n            };\n            var mouseConstraint = matter_js__WEBPACK_IMPORTED_MODULE_0__[\"MouseConstraint\"].create(engine, {\n                mouse: mouse,\n                constraint: matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Constraint\"].create(constraintOptions)\n            });\n            / *リサイズ * /;\n            matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Render\"]['lookAt'](render, {\n                min: { x: 0, y: 0 },\n                max: {\n                    x: world.width || 1000,\n                    y: world.height || 1000\n                }\n            });\n            matter_js__WEBPACK_IMPORTED_MODULE_0__[\"World\"].add(engine.world, mouseConstraint);\n            render['mouse'] = mouse;\n            // an example of using mouse events on a mouse\n            /*\n            Matter.Events.on(mouseConstraint, 'mousedown', function(event) {\n                var mousePosition = event.mouse.position;\n                console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);\n                //shakeScene(engine);\n            });\n        \n            // an example of using mouse events on a mouse\n            Matter.Events.on(mouseConstraint, 'mouseup', function(event) {\n                var mousePosition = event.mouse.position;\n                console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);\n            });\n        \n            // an example of using mouse events on a mouse\n            Matter.Events.on(mouseConstraint, 'startdrag', function(event) {\n                console.log('startdrag', event);\n            });\n        \n            // an example of using mouse events on a mouse\n            Matter.Events.on(mouseConstraint, 'enddrag', function(event) {\n                console.log('enddrag', event);\n            });\n            */\n        }\n        / * 重力 ここでいいのか? */;\n        engine.world.gravity.x = world.gravityX || 0;\n        engine.world.gravity.y = world.gravityY || 0;\n        return {\n            engine: engine,\n            runner: runner,\n            render: render,\n            canvas: render.canvas,\n            vars: {},\n            newbodyFunc: {},\n        };\n    };\n    Arare.prototype.ready = function (ctx) {\n        matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Runner\"].run(ctx.runner, ctx.engine);\n        / *物理エンジンを動かす * /;\n        /* 描画開始 */\n        matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Render\"].run(ctx.render);\n        ctx.runner.enabled = false;\n        / *初期位置を描画したら一度止める * /;\n    };\n    Arare.prototype.start = function (ctx) {\n        //console.log(\"start\");\n        ctx.runner.enabled = true;\n    };\n    Arare.prototype.pause = function (ctx) {\n        //console.log(\"pause\");\n        ctx.runner.enabled = false;\n    };\n    Arare.prototype.reset = function (ctx) {\n        if (ctx.runner) {\n            matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Runner\"].stop(ctx.runner);\n            ctx.runner = null;\n        }\n        if (ctx.engine) {\n            matter_js__WEBPACK_IMPORTED_MODULE_0__[\"World\"].clear(ctx.engine.world, false);\n            matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Engine\"].clear(ctx.engine);\n            ctx.engine = null;\n        }\n        if (ctx.render) {\n            var render = ctx.render;\n            matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Render\"].stop(render);\n            // render.canvas.remove();\n            render.canvas = null;\n            render.context = null;\n            //render.textures = {};\n        }\n    };\n    Arare.prototype.show = function (code) {\n        code.world = typeof code.world == 'undefined' ? {} : code.world;\n        var context = this.context;\n        this.reset(context);\n        context = this.init(code.world);\n        Arare.loadBodies(context, code.bodies);\n        if (code.makeRules) {\n            code.makeRules(matter_js__WEBPACK_IMPORTED_MODULE_0__, context);\n        }\n        this.ready(context);\n        this.context = context;\n        if (code.world.autoPlay) {\n            this.start(context);\n        }\n    };\n    /* コンパイル */\n    Arare.prototype.compile = function (inputs) {\n        jquery__WEBPACK_IMPORTED_MODULE_1__[\"ajax\"]({\n            url: '/compile',\n            type: 'POST',\n            data: {\n                source: inputs\n            },\n            timeout: 5000,\n        }).done(function (data) {\n            this.show(ArareCode);\n        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {\n            console.log(\"XMLHttpRequest : \" + XMLHttpRequest.status);\n            console.log(\"textStatus     : \" + textStatus);\n            console.log(\"errorThrown    : \" + errorThrown);\n        });\n    };\n    /* 物体属性 */\n    Arare.ATTRLIST = [\n        \"angle\",\n        \"angularSpeed\",\n        \"angularVelocity\",\n        \"area\",\n        \"axes\",\n        \"bounds\",\n        \"density\",\n        \"force\",\n        \"friction\",\n        \"frictionAir\",\n        \"inertia\",\n        \"inverseInertia\",\n        \"inverseMass\",\n        \"isSleeping\",\n        \"isStatic\",\n        \"label\",\n        \"mass\",\n        \"motion\",\n        \"position\",\n        \"restitution\",\n        \"sleepThreshold\",\n        \"speed\",\n        \"timeScale\",\n        \"torque\",\n        //\"type\",//オブジェクトの型\n        \"velocity\",\n        \"vertices\",\n    ];\n    /* 物体を作る */\n    Arare.newbodyFunc = {\n        \"circle\": function (vars, data) {\n            var options = Arare.bodyData(vars, data);\n            return function (x, y) {\n                return matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Bodies\"].circle(x, y, data.radius, options);\n            };\n        },\n        \"rectangle\": function (vars, data) {\n            var options = Arare.bodyData(vars, data);\n            return function (x, y) {\n                return matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Bodies\"].rectangle(x, y, data.width, data.height, options);\n            };\n        },\n        \"pendulum\": function (vars, data) {\n            var options = Arare.bodyData(vars, data);\n            return function (x, y) {\n                return matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Composites\"]['newtonsCradle'](x, y, options['columns'] || 1, options['radius'] || 80, options['length'] || 240);\n            };\n        },\n        \"unknown\": function (_, data) {\n            var options = {};\n            return function (x, y) {\n                return matter_js__WEBPACK_IMPORTED_MODULE_0__[\"Bodies\"].circle(x, y, data.radius, options);\n            };\n        }\n    };\n    return Arare;\n}());\n\n/*\nMatter.Render.bodies = function (render, bodies, context) {\n    var c = context,\n    engine = render.engine,\n    options = render.options,\n    showInternalEdges = options.showInternalEdges || !options.wireframes,\n    body, part, i, k;\n\n    for (i = 0; i < bodies.length; i++) {\n    body = bodies[i];\n    if (!body.render.visible)\n        continue;\n\n    // handle compound parts\n    for (k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k++) {\n        part = body.parts[k];\n\n        if (!part.render.visible)\n        continue;\n\n        if (options.showSleeping && body.isSleeping) {\n        c.globalAlpha = 0.5 * part.render.opacity;\n        } else if (part.render.opacity !== 1) {\n        c.globalAlpha = part.render.opacity;\n        }\n\n        if (part.render.sprite && part.render.sprite.texture && !options.wireframes) {\n        // part sprite\n        var sprite = part.render.sprite,\n            texture = _getTexture(render, sprite.texture);\n\n        c.translate(part.position.x, part.position.y);\n        c.rotate(part.angle);\n\n        c.drawImage(\n            texture,\n            texture.width * -sprite.xOffset * sprite.xScale,\n            texture.height * -sprite.yOffset * sprite.yScale,\n            texture.width * sprite.xScale,\n            texture.height * sprite.yScale\n        );\n\n        // revert translation, hopefully faster than save / restore\n        c.rotate(-part.angle);\n        c.translate(-part.position.x, -part.position.y);\n        } else {\n        // part polygon\n        if (part.circleRadius) {\n            c.beginPath();\n            c.arc(part.position.x, part.position.y, part.circleRadius, 0, 2 * Math.PI);\n        } else {\n            c.beginPath();\n            c.moveTo(part.vertices[0].x, part.vertices[0].y);\n\n            for (var j = 1; j < part.vertices.length; j++) {\n            if (!part.vertices[j - 1].isInternal || showInternalEdges) {\n                c.lineTo(part.vertices[j].x, part.vertices[j].y);\n            } else {\n                c.moveTo(part.vertices[j].x, part.vertices[j].y);\n            }\n\n            if (part.vertices[j].isInternal && !showInternalEdges) {\n                c.moveTo(part.vertices[(j + 1) % part.vertices.length].x, part.vertices[(j + 1) % part.vertices.length].y);\n            }\n            }\n\n            c.lineTo(part.vertices[0].x, part.vertices[0].y);\n            c.closePath();\n        }\n\n        if (!options.wireframes) {\n            c.fillStyle = part.render.fillStyle;\n            if (part.render.lineWidth) {\n            c.lineWidth = part.render.lineWidth;\n            c.strokeStyle = part.render.strokeStyle;\n            c.stroke();\n            }\n            c.fill();\n        } else {\n            c.lineWidth = 3;\n            c.strokeStyle = '#bbb';\n            c.stroke();\n        }\n        if (part.render.text) {\n            c.font = part.render.font || \"24px Arial\";\n            c.fillStyle = part.render.textStyle || 'rgba(255,0,127,0.5)';\n            c.fillText(\"\" + part.render.text, part.position.x, part.position.y);\n        }\n        }\n        c.globalAlpha = 1;\n    }\n    }\n};\n*/ \n\n\n//# sourceURL=webpack:///./src/arare.ts?");
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ArareCode", function() { return ArareCode; });
+var width = 1000;
+var height = 1000;
+var ArareCode = {
+    world: {
+        'width': 1000,
+        'height': 1000,
+        'xGravity': 1,
+        'yGravity': 1,
+        'mouse': true,
+        'ticker': { 'x': 10, 'y': 10 },
+    },
+    bodies: [
+        {
+            'value': 0,
+        },
+        {
+            'shape': "circle",
+            'concept': ['ボール', '円'],
+            'name': 'ボール',
+            'width': 50,
+            'height': 50,
+            'position': {
+                'x': 50,
+                'y': 500,
+            },
+            'angle': 0.2 * Math.PI,
+            'fillStyle': 'rgba(11,11,11,0.1)',
+            'velocity': { x: 1, y: 1 },
+            'value': "ほげ",
+            'isSensor': true,
+        },
+        {
+            'shape': "rectangle",
+            'concept': ['X', '壁', '長方形'],
+            'isStatic': true,
+            'chamfer': true,
+            'name': 'X',
+            'slop': 0.001,
+            'position': {
+                'x': width * 0 / 100,
+                'y': height * 98 / 100,
+            },
+        },
+        {
+            'value': 2,
+            'name': 'Y',
+        },
+        {
+            'name': 'SCORE',
+            'value': 1,
+            'position': { 'x': 100, 'y': 100 },
+        },
+    ],
+    errors: []
+};
+
+
+/***/ }),
+
+/***/ "./src/arare2.ts":
+/*!***********************!*\
+  !*** ./src/arare2.ts ***!
+  \***********************/
+/*! exports provided: Arare2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Arare2", function() { return Arare2; });
+/* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! matter-js */ "./node_modules/matter-js/build/matter.js");
+/* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(matter_js__WEBPACK_IMPORTED_MODULE_0__);
+
+//(Arare2, {}) -> (number, number, number) -> any
+var shapeFuncMap = {
+    "circle": function (ctx, options) {
+        return function (x, y, index) {
+            var radius = options['radius'] || 25;
+            if (options['width']) {
+                radius = options['width'] / 2;
+            }
+            return matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"].circle(x, y, radius, options);
+        };
+    },
+    "rectangle": function (ctx, options) {
+        return function (x, y, index) {
+            return matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"].rectangle(x, y, options['width'] || 100, options['height'] || 100, options);
+        };
+    },
+    "unknown": function (ctx, options) {
+        return function (x, y, index) {
+            var radius = options['radius'] || 25;
+            if (options['width']) {
+                radius = options['width'] / 2;
+            }
+            return matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"].circle(x, y, radius, options);
+        };
+    }
+};
+var shapeFunc = function (code, options) {
+    var shape = options['shape'] || 'unknown';
+    if (code.shapeFuncMap && code.shapeFuncMap[shape]) {
+        return code.shapeFuncMap[shape];
+    }
+    else if (shapeFuncMap[shape]) {
+        return shapeFuncMap[shape];
+    }
+    return shapeFuncMap["unknown"];
+};
+var Arare2 = /** @class */ (function () {
+    function Arare2(width, height) {
+        this.width = width;
+        this.height = height;
+        // create an engine
+        this.engine = matter_js__WEBPACK_IMPORTED_MODULE_0__["Engine"].create();
+        /* engineのアクティブ、非アクティブの制御を行う */
+        this.runner = matter_js__WEBPACK_IMPORTED_MODULE_0__["Runner"].create({});
+        var renderOptions = {
+            /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
+            element: document.getElementById("canvas"),
+            engine: this.engine,
+            options: {
+                /* オブジェクトが枠線のみになる */
+                width: this.width,
+                height: this.height,
+                background: 'rgba(0, 0, 0, 0)',
+                wireframes: false,
+            },
+        };
+        this.render = matter_js__WEBPACK_IMPORTED_MODULE_0__["Render"].create(renderOptions);
+        this.canvas = this.render.canvas;
+    }
+    Arare2.prototype.set_window_size = function (width, height) {
+        this.width = width;
+        this.height = height;
+    };
+    Arare2.prototype.getWidth = function () {
+        return this.width;
+    };
+    Arare2.prototype.getHeight = function () {
+        return this.height;
+    };
+    Arare2.prototype.getCanvas = function () {
+        return this.canvas;
+    };
+    Arare2.prototype.getRender = function () {
+        return this.render;
+    };
+    Arare2.prototype.getDebug = function () {
+        return this.debug;
+    };
+    Arare2.prototype.setDebug = function (debug) {
+        this.debug = debug;
+    };
+    Arare2.prototype.ready = function () {
+        matter_js__WEBPACK_IMPORTED_MODULE_0__["Runner"].run(this.runner, this.engine);
+        / *物理エンジンを動かす * /;
+        matter_js__WEBPACK_IMPORTED_MODULE_0__["Render"].run(this.render); /* 描画開始 */
+        this.runner.enabled = false;
+        / *初期位置を描画したら一度止める * /;
+    };
+    Arare2.prototype.start = function () {
+        //console.log("start");
+        this.runner.enabled = true;
+    };
+    Arare2.prototype.pause = function () {
+        //console.log("pause");
+        this.runner.enabled = false;
+    };
+    Arare2.prototype.dispose = function () {
+        if (this.runner) {
+            matter_js__WEBPACK_IMPORTED_MODULE_0__["Runner"].stop(this.runner);
+            this.runner = null;
+        }
+        if (this.engine) {
+            //Matter.World.clear(this.engine.world);
+            matter_js__WEBPACK_IMPORTED_MODULE_0__["Engine"].clear(this.engine);
+            this.engine = null;
+        }
+        if (this.render) {
+            matter_js__WEBPACK_IMPORTED_MODULE_0__["Render"].stop(this.render);
+            // render.canvas.remove();
+            //render.canvas = null;
+            //render.context = null;
+            //render.textures = {};
+        }
+    };
+    Arare2.prototype.load = function (code) {
+        if (code.world) {
+            var world = code.world;
+            matter_js__WEBPACK_IMPORTED_MODULE_0__["Render"]['lookAt'](this.render, {
+                min: { x: 0, y: 0 },
+                max: {
+                    x: world['width'] || 1000,
+                    y: world['height'] || 1000
+                }
+            });
+        }
+        if (code.errors) {
+            //this.notify(this, code.errors);
+        }
+        if (code.bodies) {
+            var bodies = [];
+            this.vars = {};
+            for (var _i = 0, _a = code.bodies; _i < _a.length; _i++) {
+                var data = _a[_i];
+                if (data.shape && data.position) {
+                    var shape = shapeFunc(code, data)(this, data);
+                    var body = shape(data.position.x, data.position.y, -1);
+                    if (data.name) {
+                        this.vars[data.name] = body;
+                    }
+                    if (body.id) {
+                        bodies.push(body);
+                    }
+                }
+                /*  else {
+                  if(data.x && data.y) {
+                    data.deref = data.deref || defaultDeref;
+                    vars.push(data);
+                  }
+                }*/
+            }
+            matter_js__WEBPACK_IMPORTED_MODULE_0__["World"].add(this.engine.world, bodies);
+            /*
+            if(vars.length > 0) {
+              this.render.options.variables = vars;
+            }
+            if (code.rules) {
+              code.rules(Matter, this);
+            }
+            */
+            this.ready();
+        }
+    };
+    Arare2.prototype.compile = function (inputs) {
+        $.ajax({
+            url: '/compile',
+            type: 'POST',
+            data: {
+                source: inputs
+            },
+            timeout: 5000,
+        }).done(function (data) {
+            this.load(data);
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            console.log("XMLHttpRequest : " + XMLHttpRequest);
+            console.log(errorThrown);
+            console.log(textStatus);
+        }).always(function (data) {
+            console.log(data);
+        });
+    };
+    return Arare2;
+}());
+
+
 
 /***/ }),
 
@@ -20980,7 +21237,180 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) *
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ \"./node_modules/jquery/dist/jquery.js\");\n/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _arare__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./arare */ \"./src/arare.ts\");\n/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/ace.js */ \"./node_modules/ace-builds/src-min-noconflict/ace.js\");\n/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js */ \"./node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js\");\n/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_3__);\n\n\n\n\n/* editor */\nvar arare = new _arare__WEBPACK_IMPORTED_MODULE_1__[\"Arare\"](500, 500);\nvar editor = _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_2__[\"edit\"](\"editor\");\neditor.setTheme(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_3__);\neditor.getSession().setUseWrapMode(true); /* 折り返しあり */\n//editor.setFontSize(24);\nvar timer = null;\neditor.on(\"change\", function (cm, obj) {\n    if (timer) {\n        clearTimeout(timer);\n        timer = null;\n    }\n    timer = setTimeout(function () {\n        //arare.compile(editor.getValue());\n        arare.show(_arare__WEBPACK_IMPORTED_MODULE_1__[\"ArareCode\"]);\n        jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');\n        jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');\n    }, 400);\n});\nvar fullscreen = false;\nfunction getFullscreen() {\n    if (document['webkitFullscreenElement']) {\n        return document['webkitFullscreenElement'];\n    }\n    else if (document['mozFullScreenElement']) {\n        return document['mozFullScreenElement'];\n    }\n    else if (document['msFullscreenElement']) {\n        return document['msFullscreenElement'];\n    }\n    else if (document['fullscreenElement']) {\n        return document['fullscreenElement'];\n    }\n}\nfunction resizeMe() {\n    var w = jquery__WEBPACK_IMPORTED_MODULE_0__(window).width();\n    var h = jquery__WEBPACK_IMPORTED_MODULE_0__(window).height();\n    console.log('resizeMe', w, h, fullscreen, getFullscreen());\n    if (getFullscreen() != null) {\n        fullscreen = true;\n    }\n    if (fullscreen) {\n        var min = Math.min(w, h);\n        arare.width = min;\n        arare.height = min;\n        fullscreen = false;\n    }\n    else {\n        if (w <= 800) {\n            arare.width = w;\n            arare.height = w;\n        }\n        else {\n            var min = Math.min(w / 2, h);\n            arare.width = min;\n            arare.height = min;\n        }\n    }\n    if (arare.canvas) {\n        arare.canvas.setAttribute('width', arare.width.toString());\n        arare.canvas.setAttribute('height', arare.height.toString());\n    }\n    if (arare.context) {\n        var render = arare.context.render;\n        render.options.width = arare.width;\n        render.options.height = arare.height;\n    }\n}\njquery__WEBPACK_IMPORTED_MODULE_0__(window).on('load', resizeMe);\njquery__WEBPACK_IMPORTED_MODULE_0__(window).on('resize', resizeMe);\njquery__WEBPACK_IMPORTED_MODULE_0__('#play').on(\"click\", function () {\n    arare.start(arare.context);\n    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');\n    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');\n});\njquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'gray');\njquery__WEBPACK_IMPORTED_MODULE_0__('#pause').on(\"click\", function () {\n    arare.pause(arare.context);\n    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'black');\n    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'gray');\n});\njquery__WEBPACK_IMPORTED_MODULE_0__('#reload').on(\"click\", function () {\n    arare.show(_arare__WEBPACK_IMPORTED_MODULE_1__[\"ArareCode\"]);\n    arare.start(arare.context);\n    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');\n    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');\n});\nvar background = 'rgba(0, 0, 0, 0)';\njquery__WEBPACK_IMPORTED_MODULE_0__('#debug').on(\"click\", function () {\n    if (arare.debug) {\n        var render = arare.context.render;\n        render.options.wireframes = false;\n        render.options.showPositions = false;\n        render.options.showMousePositions = false;\n        render.options.showVelocity = false;\n        render.options.showAngleIndicator = false;\n        render.options.showPositions = false;\n        render.options.showBounds = false;\n        render.options.background = background;\n        arare.debug = false;\n    }\n    else {\n        var render = arare.context.render;\n        render.options.wireframes = true;\n        render.options.showPositions = true;\n        render.options.showMousePositions = true;\n        render.options.showVelocity = true;\n        render.options.showAngleIndicator = true;\n        render.options.showPositions = true;\n        background = render.options.background;\n        render.options.background = 'rgba(0, 0, 0, 0)';\n        arare.debug = true;\n    }\n});\njquery__WEBPACK_IMPORTED_MODULE_0__('#font-plus').on(\"click\", function () {\n    console.log(editor.getFontSize());\n    editor.setFontSize(editor.getFontSize() + 2);\n});\njquery__WEBPACK_IMPORTED_MODULE_0__('#font-minus').on(\"click\", function () {\n    editor.setFontSize(Math.max(8, editor.getFontSize() - 2));\n});\nfunction requestFullscreen(target) {\n    if (target.webkitRequestFullscreen) {\n        target.webkitRequestFullscreen(); //Chrome15+, Safari5.1+, Opera15+\n    }\n    else if (target.mozRequestFullScreen) {\n        target.mozRequestFullScreen(); //FF10+\n    }\n    else if (target.msRequestFullscreen) {\n        target.msRequestFullscreen(); //IE11+\n    }\n    else if (target.requestFullscreen) {\n        target.requestFullscreen(); // HTML5 Fullscreen API仕様\n    }\n    else {\n        //alert('ご利用のブラウザはフルスクリーン操作に対応していません');\n        return;\n    }\n}\nfunction exitFullscreen() {\n    if (document['webkitCancelFullScreen']) {\n        document['webkitCancelFullScreen'](); //Chrome15+, Safari5.1+, Opera15+\n    }\n    else if (document['mozCancelFullScreen']) {\n        document['mozCancelFullScreen'](); //FF10+\n    }\n    else if (document['msExitFullscreen']) {\n        document['msExitFullscreen'](); //IE11+\n    }\n    else if (document['cancelFullScreen']) {\n        document['cancelFullScreen'](); //Gecko:FullScreenAPI仕様\n    }\n    else if (document.exitFullscreen) {\n        document.exitFullscreen(); // HTML5 Fullscreen API仕様\n    }\n}\ndocument.onkeydown = function (evt) {\n    var isEscape = false;\n    isEscape = (evt.key == \"Escape\" || evt.key == \"Esc\");\n    if (isEscape) {\n        exitFullscreen();\n    }\n};\njquery__WEBPACK_IMPORTED_MODULE_0__('#extend').on(\"click\", function () {\n    if (arare.canvas) {\n        requestFullscreen(arare.canvas);\n    }\n});\narare.show(_arare__WEBPACK_IMPORTED_MODULE_1__[\"ArareCode\"]);\n\n\n//# sourceURL=webpack:///./src/editor.ts?");
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _arare2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./arare2 */ "./src/arare2.ts");
+/* harmony import */ var _arare2_code__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./arare2-code */ "./src/arare2-code.ts");
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/ace.js */ "./node_modules/ace-builds/src-min-noconflict/ace.js");
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js */ "./node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js");
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+
+/* editor */
+var arare = new _arare2__WEBPACK_IMPORTED_MODULE_1__["Arare2"](500, 500);
+var editor = _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__["edit"]("editor");
+editor.setTheme(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__);
+editor.getSession().setUseWrapMode(true); /* 折り返しあり */
+//editor.setFontSize(24);
+var timer = null;
+editor.on("change", function (cm, obj) {
+    if (timer) {
+        clearTimeout(timer);
+        timer = null;
+    }
+    timer = setTimeout(function () {
+        //arare.compile(editor.getValue());
+        arare.load(_arare2_code__WEBPACK_IMPORTED_MODULE_2__["ArareCode"]);
+        jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
+        jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
+    }, 400);
+});
+var fullscreen = false;
+function getFullscreen() {
+    if (document['webkitFullscreenElement']) {
+        return document['webkitFullscreenElement'];
+    }
+    else if (document['mozFullScreenElement']) {
+        return document['mozFullScreenElement'];
+    }
+    else if (document['msFullscreenElement']) {
+        return document['msFullscreenElement'];
+    }
+    else if (document['fullscreenElement']) {
+        return document['fullscreenElement'];
+    }
+}
+function resizeMe() {
+    var w = jquery__WEBPACK_IMPORTED_MODULE_0__(window).width();
+    var h = jquery__WEBPACK_IMPORTED_MODULE_0__(window).height();
+    console.log('resizeMe', w, h, fullscreen, getFullscreen());
+    if (getFullscreen() != null) {
+        fullscreen = true;
+    }
+    if (fullscreen) {
+        var min = Math.min(w, h);
+        arare.set_window_size(min, min);
+        fullscreen = false;
+    }
+    else {
+        if (w <= 800) {
+            arare.set_window_size(w, w);
+        }
+        else {
+            var min = Math.min(w / 2, h);
+            arare.set_window_size(min, min);
+        }
+    }
+    arare.getCanvas().setAttribute('width', arare.getWidth().toString());
+    arare.getCanvas().setAttribute('height', arare.getHeight().toString());
+    var render = arare.getRender();
+    render.options.width = arare.getWidth();
+    render.options.height = arare.getHeight();
+}
+jquery__WEBPACK_IMPORTED_MODULE_0__(window).on('load', resizeMe);
+jquery__WEBPACK_IMPORTED_MODULE_0__(window).on('resize', resizeMe);
+jquery__WEBPACK_IMPORTED_MODULE_0__('#play').on("click", function () {
+    arare.start();
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
+});
+jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'gray');
+jquery__WEBPACK_IMPORTED_MODULE_0__('#pause').on("click", function () {
+    arare.pause();
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'black');
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'gray');
+});
+jquery__WEBPACK_IMPORTED_MODULE_0__('#reload').on("click", function () {
+    arare.load(_arare2_code__WEBPACK_IMPORTED_MODULE_2__["ArareCode"]);
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
+});
+var background = 'rgba(0, 0, 0, 0)';
+jquery__WEBPACK_IMPORTED_MODULE_0__('#debug').on("click", function () {
+    if (arare.getDebug()) {
+        var render = arare.getRender();
+        render.options.wireframes = false;
+        render.options['showPositions'] = false;
+        render.options['showMousePositions'] = false;
+        render.options['showVelocity'] = false;
+        render.options['showAngleIndicator'] = false;
+        render.options['showPositions'] = false;
+        render.options['showBounds'] = false;
+        render.options['background'] = background;
+        arare.setDebug(false);
+    }
+    else {
+        var render = arare.getRender();
+        render.options.wireframes = true;
+        render.options['showPositions'] = true;
+        render.options['showMousePositions'] = true;
+        render.options['showVelocity'] = true;
+        render.options['showAngleIndicator'] = true;
+        render.options['showPositions'] = true;
+        background = render.options['background'];
+        render.options['background'] = 'rgba(0, 0, 0, 0)';
+        arare.setDebug(true);
+    }
+});
+jquery__WEBPACK_IMPORTED_MODULE_0__('#font-plus').on("click", function () {
+    console.log(editor.getFontSize());
+    editor.setFontSize(editor.getFontSize() + 2);
+});
+jquery__WEBPACK_IMPORTED_MODULE_0__('#font-minus').on("click", function () {
+    editor.setFontSize(Math.max(8, editor.getFontSize() - 2));
+});
+function requestFullscreen(target) {
+    if (target.webkitRequestFullscreen) {
+        target.webkitRequestFullscreen(); //Chrome15+, Safari5.1+, Opera15+
+    }
+    else if (target.mozRequestFullScreen) {
+        target.mozRequestFullScreen(); //FF10+
+    }
+    else if (target.msRequestFullscreen) {
+        target.msRequestFullscreen(); //IE11+
+    }
+    else if (target.requestFullscreen) {
+        target.requestFullscreen(); // HTML5 Fullscreen API仕様
+    }
+    else {
+        //alert('ご利用のブラウザはフルスクリーン操作に対応していません');
+        return;
+    }
+}
+function exitFullscreen() {
+    if (document['webkitCancelFullScreen']) {
+        document['webkitCancelFullScreen'](); //Chrome15+, Safari5.1+, Opera15+
+    }
+    else if (document['mozCancelFullScreen']) {
+        document['mozCancelFullScreen'](); //FF10+
+    }
+    else if (document['msExitFullscreen']) {
+        document['msExitFullscreen'](); //IE11+
+    }
+    else if (document['cancelFullScreen']) {
+        document['cancelFullScreen'](); //Gecko:FullScreenAPI仕様
+    }
+    else if (document.exitFullscreen) {
+        document.exitFullscreen(); // HTML5 Fullscreen API仕様
+    }
+}
+document.onkeydown = function (evt) {
+    var isEscape = false;
+    isEscape = (evt.key == "Escape" || evt.key == "Esc");
+    if (isEscape) {
+        exitFullscreen();
+    }
+};
+jquery__WEBPACK_IMPORTED_MODULE_0__('#extend').on("click", function () {
+    requestFullscreen(arare.getCanvas());
+});
+arare.load(_arare2_code__WEBPACK_IMPORTED_MODULE_2__["ArareCode"]);
+
 
 /***/ })
 
