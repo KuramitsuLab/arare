@@ -126,7 +126,7 @@ export class Arare2 {
 
   public load(code: Code) {
     if (code.world) {
-      var world = world;
+      var world = code.world;
       Render['lookAt'](this.render, {
         min: { x: 0, y: 0 },
         max: {
@@ -137,15 +137,19 @@ export class Arare2 {
       /* マウス */
       if (world.mouse || true) {
         var mouse = Mouse.create(this.render.canvas);
-        var mouseConstraint = MouseConstraint.create(this.engine, {
+        var constraintOptions = {
+          pointA: { x: 0, y: 0 },
+          pointB: { x: 0, y: 0 },
+          stiffness: world.mouseStiffness || 0.2,  /* 剛性 */
+        };
+        constraintOptions['render'] = {
+          visible: world.mouseVisible || false
+        };
+        var mouseConstraint = Matter.MouseConstraint.create(this.engine, {
           mouse: mouse,
-          constraint: {
-            stiffness: world.mouseStiffness || 0.2,
-            render: { /* 剛性 */
-              visible: false
-            }
-          }
+          constraint: Matter.Constraint.create(constraintOptions)
         });
+
         World.add(this.engine.world, mouseConstraint);
         //this.render.mouse = mouse;
 
@@ -243,7 +247,7 @@ export class Arare2 {
         },
         timeout: 5000,
       }).done(function (data) {
-        this.load(ArareCode);
+        this.load(data);
       }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
         console.log("XMLHttpRequest : " + XMLHttpRequest);
         console.log(errorThrown);
