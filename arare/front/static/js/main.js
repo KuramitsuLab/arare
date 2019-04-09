@@ -21042,50 +21042,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! matter-js */ "./node_modules/matter-js/build/matter.js");
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(matter_js__WEBPACK_IMPORTED_MODULE_0__);
 
+var Bodies = matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"];
+var Engine = matter_js__WEBPACK_IMPORTED_MODULE_0__["Engine"];
+var Runner = matter_js__WEBPACK_IMPORTED_MODULE_0__["Runner"];
+var Render = matter_js__WEBPACK_IMPORTED_MODULE_0__["Render"];
+var MouseConstraint = matter_js__WEBPACK_IMPORTED_MODULE_0__["MouseConstraint"];
+var Mouse = matter_js__WEBPACK_IMPORTED_MODULE_0__["Mouse"];
+var World = matter_js__WEBPACK_IMPORTED_MODULE_0__["World"];
+var Common = matter_js__WEBPACK_IMPORTED_MODULE_0__["Common"];
 //(Arare2, {}) -> (number, number, number) -> any
-var shapeFuncMap = {
-    "circle": function (ctx, options) {
-        return function (x, y, index) {
-            var radius = options['radius'] || 25;
-            if (options['width']) {
-                radius = options['width'] / 2;
-            }
-            return matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"].circle(x, y, radius, options);
-        };
-    },
-    "rectangle": function (ctx, options) {
-        return function (x, y, index) {
-            return matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"].rectangle(x, y, options['width'] || 100, options['height'] || 100, options);
-        };
-    },
-    "unknown": function (ctx, options) {
-        return function (x, y, index) {
-            var radius = options['radius'] || 25;
-            if (options['width']) {
-                radius = options['width'] / 2;
-            }
-            return matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"].circle(x, y, radius, options);
-        };
-    }
-};
-var shapeFunc = function (code, options) {
-    var shape = options['shape'] || 'unknown';
-    if (code.shapeFuncMap && code.shapeFuncMap[shape]) {
-        return code.shapeFuncMap[shape];
-    }
-    else if (shapeFuncMap[shape]) {
-        return shapeFuncMap[shape];
-    }
-    return shapeFuncMap["unknown"];
-};
 var Arare2 = /** @class */ (function () {
     function Arare2(width, height) {
         this.width = width;
         this.height = height;
         // create an engine
-        this.engine = matter_js__WEBPACK_IMPORTED_MODULE_0__["Engine"].create();
+        this.engine = Engine.create();
         /* engineのアクティブ、非アクティブの制御を行う */
-        this.runner = matter_js__WEBPACK_IMPORTED_MODULE_0__["Runner"].create({});
+        this.runner = Runner.create({});
         var renderOptions = {
             /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
             element: document.getElementById("canvas"),
@@ -21098,7 +21071,7 @@ var Arare2 = /** @class */ (function () {
                 wireframes: false,
             },
         };
-        this.render = matter_js__WEBPACK_IMPORTED_MODULE_0__["Render"].create(renderOptions);
+        this.render = Render.create(renderOptions);
         this.canvas = this.render.canvas;
     }
     Arare2.prototype.set_window_size = function (width, height) {
@@ -21124,9 +21097,9 @@ var Arare2 = /** @class */ (function () {
         this.debug = debug;
     };
     Arare2.prototype.ready = function () {
-        matter_js__WEBPACK_IMPORTED_MODULE_0__["Runner"].run(this.runner, this.engine);
+        Runner.run(this.runner, this.engine);
         / *物理エンジンを動かす * /;
-        matter_js__WEBPACK_IMPORTED_MODULE_0__["Render"].run(this.render); /* 描画開始 */
+        Render.run(this.render); /* 描画開始 */
         this.runner.enabled = false;
         / *初期位置を描画したら一度止める * /;
     };
@@ -21140,16 +21113,16 @@ var Arare2 = /** @class */ (function () {
     };
     Arare2.prototype.dispose = function () {
         if (this.runner) {
-            matter_js__WEBPACK_IMPORTED_MODULE_0__["Runner"].stop(this.runner);
+            Runner.stop(this.runner);
             this.runner = null;
         }
         if (this.engine) {
             //Matter.World.clear(this.engine.world);
-            matter_js__WEBPACK_IMPORTED_MODULE_0__["Engine"].clear(this.engine);
+            Engine.clear(this.engine);
             this.engine = null;
         }
         if (this.render) {
-            matter_js__WEBPACK_IMPORTED_MODULE_0__["Render"].stop(this.render);
+            Render.stop(this.render);
             // render.canvas.remove();
             //render.canvas = null;
             //render.context = null;
@@ -21159,14 +21132,81 @@ var Arare2 = /** @class */ (function () {
     Arare2.prototype.load = function (code) {
         if (code.world) {
             var world = code.world;
-            matter_js__WEBPACK_IMPORTED_MODULE_0__["Render"]['lookAt'](this.render, {
+            Render['lookAt'](this.render, {
                 min: { x: 0, y: 0 },
                 max: {
-                    x: world['width'] || 1000,
-                    y: world['height'] || 1000
+                    x: world.width || 1000,
+                    y: world.height || 1000
                 }
             });
-        }
+            /* マウス */
+            if (world.mouse || true) {
+                var mouse = Mouse.create(this.render.canvas);
+                var constraintOptions = {
+                    pointA: { x: 0, y: 0 },
+                    pointB: { x: 0, y: 0 },
+                    stiffness: world.mouseStiffness || 0.2,
+                };
+                constraintOptions['render'] = {
+                    visible: world.mouseVisible || false
+                };
+                var mouseConstraint = matter_js__WEBPACK_IMPORTED_MODULE_0__["MouseConstraint"].create(this.engine, {
+                    mouse: mouse,
+                    constraint: matter_js__WEBPACK_IMPORTED_MODULE_0__["Constraint"].create(constraintOptions)
+                });
+                World.add(this.engine.world, mouseConstraint);
+                //this.render.mouse = mouse;
+                // an example of using mouse events on a mouse
+                /*
+                Events.on(mouseConstraint, 'mousedown', function(event) {
+                    var mousePosition = event.mouse.position;
+                    console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
+                    //shakeScene(engine);
+                });
+         
+                // an example of using mouse events on a mouse
+                Events.on(mouseConstraint, 'mouseup', function(event) {
+                    var mousePosition = event.mouse.position;
+                    console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
+                });
+         
+                // an example of using mouse events on a mouse
+                Events.on(mouseConstraint, 'startdrag', function(event) {
+                    console.log('startdrag', event);
+                });
+         
+                // an example of using mouse events on a mouse
+                Events.on(mouseConstraint, 'enddrag', function(event) {
+                    console.log('enddrag', event);
+                });
+                */
+            }
+            var engine = this.engine;
+            engine.world.gravity.x = world.xGravity || 0;
+            engine.world.gravity.y = world.yGravity || 0;
+            if (world.yGravity) {
+                window.addEventListener('deviceorientation', function (event) {
+                    var orientation = window.orientation || 0;
+                    var gravity = engine.world.gravity;
+                    if (orientation === 0) {
+                        gravity.x = Common.clamp(event.gamma, -90, 90) / 90;
+                        gravity.y = Common.clamp(event.beta, -90, 90) / 90;
+                    }
+                    else if (orientation === 180) {
+                        gravity.x = Common.clamp(event.gamma, -90, 90) / 90;
+                        gravity.y = Common.clamp(-event.beta, -90, 90) / 90;
+                    }
+                    else if (orientation === 90) {
+                        gravity.x = Common.clamp(event.beta, -90, 90) / 90;
+                        gravity.y = Common.clamp(-event.gamma, -90, 90) / 90;
+                    }
+                    else if (orientation === -90) {
+                        gravity.x = Common.clamp(-event.beta, -90, 90) / 90;
+                        gravity.y = Common.clamp(event.gamma, -90, 90) / 90;
+                    }
+                });
+            }
+        } /* world */
         if (code.errors) {
             //this.notify(this, code.errors);
         }
@@ -21192,7 +21232,7 @@ var Arare2 = /** @class */ (function () {
                   }
                 }*/
             }
-            matter_js__WEBPACK_IMPORTED_MODULE_0__["World"].add(this.engine.world, bodies);
+            World.add(this.engine.world, bodies);
             /*
             if(vars.length > 0) {
               this.render.options.variables = vars;
@@ -21205,26 +21245,68 @@ var Arare2 = /** @class */ (function () {
         }
     };
     Arare2.prototype.compile = function (inputs) {
-        $.ajax({
-            url: '/compile',
-            type: 'POST',
-            data: {
-                source: inputs
-            },
-            timeout: 5000,
-        }).done(function (data) {
-            this.load(data);
-        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
-            console.log("XMLHttpRequest : " + XMLHttpRequest);
-            console.log(errorThrown);
-            console.log(textStatus);
-        }).always(function (data) {
-            console.log(data);
-        });
+        try {
+            $.ajax({
+                url: '/compile',
+                type: 'POST',
+                data: {
+                    source: inputs
+                },
+                timeout: 5000,
+            }).done(function (data) {
+                this.load(data);
+            }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log("XMLHttpRequest : " + XMLHttpRequest);
+                console.log(errorThrown);
+                console.log(textStatus);
+            }).always(function (data) {
+                console.log(data);
+            });
+        }
+        catch (e) {
+            console.log(e); // FIXME
+        }
     };
     return Arare2;
 }());
 
+/* shapeFunc 物体の形状から物体を生成する関数 */
+//(Arare2, {}) -> (number, number, number) -> any
+var shapeFuncMap = {
+    "circle": function (ctx, options) {
+        return function (x, y, index) {
+            var radius = options['radius'] || 25;
+            if (options['width']) {
+                radius = options['width'] / 2;
+            }
+            return Bodies.circle(x, y, radius, options);
+        };
+    },
+    "rectangle": function (ctx, options) {
+        return function (x, y, index) {
+            return Bodies.rectangle(x, y, options['width'] || 100, options['height'] || 100, options);
+        };
+    },
+    "unknown": function (ctx, options) {
+        return function (x, y, index) {
+            var radius = options['radius'] || 25;
+            if (options['width']) {
+                radius = options['width'] / 2;
+            }
+            return Bodies.circle(x, y, radius, options);
+        };
+    }
+};
+var shapeFunc = function (code, options) {
+    var shape = options['shape'] || 'unknown';
+    if (code.shapeFuncMap && code.shapeFuncMap[shape]) {
+        return code.shapeFuncMap[shape];
+    }
+    else if (shapeFuncMap[shape]) {
+        return shapeFuncMap[shape];
+    }
+    return shapeFuncMap["unknown"];
+};
 
 
 /***/ }),
