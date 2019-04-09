@@ -55,7 +55,7 @@ html {
     background-color: white;
     margin: 0 auto;
 }
-#editor{
+#editor1{
     position: center;
     width: 100%;
     height: 100%;
@@ -79,11 +79,11 @@ html {
       background-color: "white";
       margin: 0 auto;
   }
-  #editor{
+  #editor1{
       position: center;
       width: 95%;
       height: 300px;
-      background-color: #FFCCFF;
+      background-color: black;
       font-size: calc(100vw / 45);
       text-align: left;
       margin: 0 auto;
