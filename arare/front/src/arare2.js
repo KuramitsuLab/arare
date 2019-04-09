@@ -61,6 +61,24 @@ var ArareCode = ArareCode || {
       fillStyle: 'blue',
     },
     {
+      shape: "rapezoid",
+      name: "D",
+      x: 100,
+      y: 200,
+      width: 1000,
+      height: 20,
+      fillStyle: 'blue',
+    },
+    {
+      shape: "polygon",
+      name: "E",
+      x: 100,
+      y: 300,
+      width: 1000,
+      height: 20,
+      fillStyle: 'red',
+    },
+    {
       name: "ほげほご",
       value: 123,
       x: 100,
@@ -164,6 +182,24 @@ var ArareCode = ArareCode || {
     return function(x, y, index) {
       var options = Arare.newOption(ctx, data, index);
       return Matter.Bodies.rectangle(x, y, data.width || 100, data.height || 100, options);
+    }
+  }
+
+  Arare.newbodyFunc["polygon"] = function(ctx, data) {
+    return function(x, y, index) {
+      var options = Arare.newOption(ctx, data, index);
+      var radius = data.radius || 25;
+      if (data.width) {
+          radius = data.width / 2;
+      }
+      return Matter.Bodies.polygon(x, y, data.sides, radius, options);
+    }
+  }
+
+  Arare.newbodyFunc["trapezoid"] = function(ctx, data) {
+    return function(x, y, index) {
+      var options = Arare.newOption(ctx, data, index);
+      return Matter.Bodies.trapezoid(x, y, data.width || 100, data.height || 100, data.slope || 0.5, options);
     }
   }
 

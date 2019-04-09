@@ -282,6 +282,20 @@ let shapeFuncMap: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: 
       return Bodies.rectangle(x, y, options['width'] || 100, options['height'] || 100, options);
     }
   },
+  "polygon": function(ctx: Arare2, options: {}) {
+    return function(x, y, index) {
+      var radius = options['radius'] || 25;
+      if (options['width']) {
+          radius = options['width'] / 2;
+      }
+      return Matter.Bodies.polygon(x, y, options['sides'] || 5, radius, options);
+    }
+  },
+  "trapezoid": function(ctx: Arare2, options: {}) {
+    return function(x, y, index) {
+      return Matter.Bodies.trapezoid(x, y, options['width'] || 100, options['height'] || 100, options['slope'] || 0.5, options);
+    }
+  },
   "unknown": function (ctx: Arare2, options: {}) {
     return function (x, y, index) {
       var radius = options['radius'] || 25;
