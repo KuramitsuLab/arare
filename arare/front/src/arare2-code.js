@@ -39,8 +39,32 @@ export var ArareCode = {
       'name': 'X',
       'slop': 0.001,
       'position': {
-        'x': width * 0 / 100,
-        'y': height * 98 / 100,
+        'x': 200,
+        'y': 300,
+      },
+    },
+    {
+      'shape': "polygon",
+      'concept': ['多角形'],
+      'isStatic': true,
+      'chamfer': true,
+      'sides': 6,
+      'name': '多角形',
+      'position': {
+        'x': 100,
+        'y': 300,
+      },
+    },
+    {
+      'shape': "trapezoid",
+      'concept': ['台形'],
+      'isStatic': true,
+      'chamfer': true,
+      'name': 'X',
+      'slop': 0.45,
+      'position': {
+        'x': 50,
+        'y': 700,
       },
     },
     {
