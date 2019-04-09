@@ -1,10 +1,11 @@
 import * as $ from 'jquery';
-import {Arare, ArareCode} from './arare';
+import {Arare2} from './arare2';
+import {ArareCode} from './arare2-code';
 import * as ace from '../node_modules/ace-builds/src-min-noconflict/ace.js';
 import * as solarized_light from '../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js';
 /* editor */
 
-let arare: Arare = new Arare(500, 500);
+let arare: Arare2 = new Arare2(500, 500);
 
 var editor = ace.edit("editor");
 editor.setTheme(solarized_light);
@@ -19,7 +20,7 @@ editor.on("change", function (cm, obj) {
   }
   timer = setTimeout(function () {
     //arare.compile(editor.getValue());
-    arare.show(ArareCode);
+    arare.load(ArareCode);
     $('#play')[0].setAttribute('stroke', 'gray');
     $('#pause')[0].setAttribute('stroke', 'black');
   }, 400);
@@ -47,82 +48,75 @@ function resizeMe() {
   }
   if (fullscreen) {
     var min = Math.min(w, h);
-    arare.width = min;
-    arare.height = min;
+    arare.set_window_size(min, min);
     fullscreen = false;
   }
   else {
     if (w <= 800) {
-      arare.width = w;
-      arare.height = w;
+      arare.set_window_size(w, w);
     }
     else {
       var min = Math.min(w / 2, h);
-      arare.width = min;
-      arare.height = min;
+      arare.set_window_size(min, min);
     }
   }
 
-  if (arare.canvas) {
-    arare.canvas.setAttribute('width', arare.width.toString());
-    arare.canvas.setAttribute('height', arare.height.toString());
-  }
+  arare.getCanvas().setAttribute('width', arare.getWidth().toString());
+  arare.getCanvas().setAttribute('height', arare.getHeight().toString());
 
-  if (arare.context) {
-    var render = arare.context.render;
-    render.options.width = arare.width;
-    render.options.height = arare.height;
-  }
+  var render = arare.getRender();
+  render.options.width = arare.getWidth();
+  render.options.height = arare.getHeight();
+
 }
 
 $(window).on('load', resizeMe);
 $(window).on('resize', resizeMe);
 
 $('#play').on("click", function () {
-  arare.start(arare.context);
+  arare.start();
   $('#play')[0].setAttribute('stroke', 'gray');
   $('#pause')[0].setAttribute('stroke', 'black');
 });
 
 $('#pause')[0].setAttribute('stroke', 'gray');
 $('#pause').on("click", function () {
-  arare.pause(arare.context);
+  arare.pause();
   $('#play')[0].setAttribute('stroke', 'black');
   $('#pause')[0].setAttribute('stroke', 'gray');
 });
 
 $('#reload').on("click", function () {
-  arare.show(ArareCode);
-  arare.start(arare.context);
+  arare.load(ArareCode);
   $('#play')[0].setAttribute('stroke', 'gray');
   $('#pause')[0].setAttribute('stroke', 'black');
 });
 
 var background = 'rgba(0, 0, 0, 0)';
 $('#debug').on("click", function () {
-  if (arare.debug) {
-    var render = arare.context.render;
+  if (arare.getDebug()) {
+    var render = arare.getRender();
     render.options.wireframes = false;
-    render.options.showPositions = false;
-    render.options.showMousePositions = false;
-    render.options.showVelocity = false;
-    render.options.showAngleIndicator = false;
-    render.options.showPositions = false;
-    render.options.showBounds = false;
-    render.options.background = background;
-    arare.debug = false;
+    render.options['showPositions'] = false;
+    render.options['showMousePositions'] = false;
+    render.options['showVelocity'] = false;
+    render.options['showAngleIndicator'] = false;
+    render.options['showPositions'] = false;
+    render.options['showBounds'] = false;
+    render.options['background'] = background;
+    arare.setDebug(false);
   }
   else {
-    var render = arare.context.render;
+    var render = arare.getRender();
     render.options.wireframes = true;
-    render.options.showPositions = true;
-    render.options.showMousePositions = true;
-    render.options.showVelocity = true;
-    render.options.showAngleIndicator = true;
-    render.options.showPositions = true;
-    background = render.options.background;
-    render.options.background = 'rgba(0, 0, 0, 0)';
-    arare.debug = true;
+    render.options['showPositions'] = true;
+    render.options['showMousePositions'] = true;
+    render.options['showVelocity'] = true;
+    render.options['showAngleIndicator'] = true;
+    render.options['showPositions'] = true;
+    background = render.options['background'];
+    render.options['background'] = 'rgba(0, 0, 0, 0)';
+    arare.setDebug(true);
   }
 });
 
@@ -173,11 +167,9 @@ document.onkeydown = function (evt) {
 };
 
 $('#extend').on("click", function () {
-  if (arare.canvas) {
-    requestFullscreen(arare.canvas);
-  }
+  requestFullscreen(arare.getCanvas());
 });
 
-arare.show(ArareCode);
+arare.load(ArareCode);
 
 
