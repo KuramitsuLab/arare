@@ -1,16 +1,8 @@
-import {Arare2} from './arare2';
-
-export type Code = {
-  world: any,
-  bodies: any[],
-  errors: {}[],
-  shapeFuncMap?: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any }
-}
 
 var width = 1000;
 var height = 1000;
 
-export let ArareCode: Code = {
+export var ArareCode = {
   world : {
     'width': 1000,
     'height': 1000,
@@ -30,7 +22,7 @@ export let ArareCode: Code = {
       'width': 50,
       'height': 50,
       'position': {
-        'x': 50,
+        'x': 500,
         'y': 500,
       },
       'angle': 0.2 * Math.PI,

@@ -1,43 +1,49 @@
 import * as Matter from 'matter-js';
-import {Code} from './arare2-code';
 
-//(Arare2, {}) -> (number, number, number) -> any
+export type Code = {
+  world: any,
+  bodies: any[],
+  errors: {}[],
+  shapeFuncMap?: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any },
+};
 
-let shapeFuncMap : {[key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any } = {
-  "circle": function(ctx: Arare2, options: {}) { 
-    return function(x, y, index) {
-      var radius = options['radius'] || 25;
+// (Arare2, {}) -> (number, number, number) -> any
+
+const shapeFuncMap : {[key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any } = {
+  circle(ctx: Arare2, options: {}) {
+    return function (x, y, index) {
+      let radius = options['radius'] || 25;
       if (options['width']) {
-          radius = options['width'] / 2;
+        radius = options['width'] / 2;
       }
       return Matter.Bodies.circle(x, y, radius, options);
-    }
+    };
   },
-  "rectangle": function(ctx: Arare2, options: {}) {
-    return function(x, y, index) {
+  rectangle(ctx: Arare2, options: {}) {
+    return function (x, y, index) {
       return Matter.Bodies.rectangle(x, y, options['width'] || 100, options['height'] || 100, options);
-    }
+    };
   },
-  "unknown": function(ctx: Arare2, options: {}) {
-    return function(x, y, index) {
-      var radius = options['radius'] || 25;
+  unknown(ctx: Arare2, options: {}) {
+    return function (x, y, index) {
+      let radius = options['radius'] || 25;
       if (options['width']) {
-          radius = options['width'] / 2;
+        radius = options['width'] / 2;
       }
-        return Matter.Bodies.circle(x, y, radius, options);
-    }
-  }
-}
+      return Matter.Bodies.circle(x, y, radius, options);
+    };
+  },
+};
 
-let shapeFunc = (code: Code, options: {}) => {
-  var shape = options['shape'] || 'unknown';
+const shapeFunc = (code: Code, options: {}) => {
+  const shape = options['shape'] || 'unknown';
   if (code.shapeFuncMap && code.shapeFuncMap[shape]) {
     return code.shapeFuncMap[shape];
-  } else if (shapeFuncMap[shape]) {
+  }  if (shapeFuncMap[shape]) {
     return shapeFuncMap[shape];
   }
-  return shapeFuncMap["unknown"];
-}
+  return shapeFuncMap['unknown'];
+};
 
 export class Arare2 {
   protected width: number;
@@ -59,9 +65,9 @@ export class Arare2 {
     this.engine = Matter.Engine.create();
     /* engineのアクティブ、非アクティブの制御を行う */
     this.runner = Matter.Runner.create({});
-    var renderOptions = {
+    const renderOptions = {
       /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
-      element: document.getElementById("canvas"),
+      element: document.getElementById('canvas'),
       engine: this.engine,
       options: {
         /* オブジェクトが枠線のみになる */
@@ -69,58 +75,58 @@ export class Arare2 {
         height: this.height,
         background: 'rgba(0, 0, 0, 0)',
         wireframes: false,
-        //showDebug: world.debug || false,
-        //showPositions: world.debug || false,
-        //showMousePositions: world.debug || false,
-        //debugString: "hoge\nこまったなあ",
+        // showDebug: world.debug || false,
+        // showPositions: world.debug || false,
+        // showMousePositions: world.debug || false,
+        // debugString: "hoge\nこまったなあ",
       },
-    }
+    };
     this.render = Matter.Render.create(renderOptions);
     this.canvas = this.render.canvas;
   }
 
   public set_window_size(width: number, height: number) {
-    this.width = width
-    this.height = height
+    this.width = width;
+    this.height = height;
   }
 
-  public getWidth(): number{
-    return this.width
+  public getWidth(): number {
+    return this.width;
   }
 
   public getHeight(): number {
-    return this.height
+    return this.height;
   }
 
-  public getCanvas(): HTMLCanvasElement{
-    return this.canvas
+  public getCanvas(): HTMLCanvasElement {
+    return this.canvas;
   }
 
-  public getRender(): Matter.Render{
-    return this.render
+  public getRender(): Matter.Render {
+    return this.render;
   }
 
-  public getDebug(): boolean{
-    return this.debug
+  public getDebug(): boolean {
+    return this.debug;
   }
 
-    public setDebug(debug: boolean) {
-        this.debug = debug
-    }
+  public setDebug(debug: boolean) {
+    this.debug = debug;
+  }
 
   public ready() {
-    Matter.Runner.run(this.runner, this.engine); / *物理エンジンを動かす * /
+    Matter.Runner.run(this.runner, this.engine); / *物理エンジンを動かす * /;
     Matter.Render.run(this.render); /* 描画開始 */
-    this.runner.enabled = false;  / *初期位置を描画したら一度止める * /
+    this.runner.enabled = false;  / *初期位置を描画したら一度止める * /;
   }
 
   public start() {
-    //console.log("start");
+    // console.log("start");
     this.runner.enabled = true;
   }
 
   public pause() {
-    //console.log("pause");
+    // console.log("pause");
     this.runner.enabled = false;
   }
 
@@ -130,40 +136,40 @@ export class Arare2 {
       this.runner = null;
     }
     if (this.engine) {
-      //Matter.World.clear(this.engine.world);
+      // Matter.World.clear(this.engine.world);
       Matter.Engine.clear(this.engine);
       this.engine = null;
     }
     if (this.render) {
       Matter.Render.stop(this.render);
       // render.canvas.remove();
-      //render.canvas = null;
-      //render.context = null;
-      //render.textures = {};
+      // render.canvas = null;
+      // render.context = null;
+      // render.textures = {};
     }
   }
 
   public load(code: Code) {
-    if(code.world) {
-      var world = code.world;
+    if (code.world) {
+      const world = code.world;
       Matter.Render['lookAt'](this.render, {
         min: { x: 0, y: 0 },
         max: {
           x: world['width'] || 1000,
-          y: world['height'] || 1000
-        }
+          y: world['height'] || 1000,
+        },
       });
     }
-    if(code.errors) {
-      //this.notify(this, code.errors);
+    if (code.errors) {
+      // this.notify(this, code.errors);
     }
-    if(code.bodies) {
-      var bodies = [];
+    if (code.bodies) {
+      const bodies = [];
       this.vars = {};
-      for (var data of code.bodies) {
-        if(data.shape && data.position) {
-          var shape = shapeFunc(code, data)(this, data);
-          var body = shape(data.position.x, data.position.y, -1);
+      for (const data of code.bodies) {
+        if (data.shape && data.position) {
+          const shape = shapeFunc(code, data)(this, data);
+          const body = shape(data.position.x, data.position.y, -1);
           if (data.name) {
             this.vars[data.name] = body;
           }
@@ -190,22 +196,22 @@ export class Arare2 {
       this.ready();
     }
   }
-    
+
   public compile(inputs: string) {
     $.ajax({
       url: '/compile',
       type: 'POST',
       data: {
-        source: inputs
+        source: inputs,
       },
-        timeout: 5000,
-    }).done(function(data) {
-        this.load(data);
-    }).fail(function(XMLHttpRequest, textStatus, errorThrown) {
-      console.log("XMLHttpRequest : " + XMLHttpRequest);
+      timeout: 5000,
+    }).done((data) => {
+      this.load(data);
+    }).fail((XMLHttpRequest, textStatus, errorThrown) => {
+      console.log(`XMLHttpRequest : ${XMLHttpRequest}`);
       console.log(errorThrown);
       console.log(textStatus);
-    }).always( (data) => {
+    }).always((data) => {
       console.log(data);
     });
   }
