@@ -66,29 +66,17 @@ export class Arare2 {
     this.height = height;
   }
 
-  public getWidth(): number {
-    return this.width;
-  }
+  public getWidth = (): number => { return this.width; };
 
-  public getHeight(): number {
-    return this.height;
-  }
+  public getHeight = (): number => { return this.height; };
 
-  public getCanvas(): HTMLCanvasElement {
-    return this.canvas;
-  }
+  public getCanvas = (): HTMLCanvasElement => { return this.canvas; };
 
-  public getRender(): Matter.Render {
-    return this.render;
-  }
+  public getRender = (): Matter.Render => { return this.render; };
 
-  public getDebug(): boolean {
-    return this.debug;
-  }
+  public getDebug = (): boolean => { return this.debug; };
 
-  public setDebug(debug: boolean) {
-    this.debug = debug;
-  }
+  public setDebug = (debug: boolean) => { this.debug = debug; };
 
   public ready() {
     Runner.run(this.runner, this.engine); / *物理エンジンを動かす * /;
@@ -267,7 +255,7 @@ export class Arare2 {
 
 // (Arare2, {}) -> (number, number, number) -> any
 
-const shapeFuncMap: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any } = {
+const shapeFuncMap: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => Matter.Body } = {
   circle (ctx: Arare2, options: {}) {
     return function (x, y, index) {
       let radius = options['radius'] || 25;
@@ -311,7 +299,8 @@ const shapeFunc = (code: Code, options: {}) => {
   const shape = options['shape'] || 'unknown';
   if (code.shapeFuncMap && code.shapeFuncMap[shape]) {
     return code.shapeFuncMap[shape];
-  }  if (shapeFuncMap[shape]) {
+  }
+  if (shapeFuncMap[shape]) {
     return shapeFuncMap[shape];
   }
   return shapeFuncMap['unknown'];
