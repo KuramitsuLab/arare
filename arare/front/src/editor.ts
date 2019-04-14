@@ -23,7 +23,7 @@ editor.on('change', (cm, obj) => {
     arare.load(ArareCode);
     $('#play')[0].setAttribute('stroke', 'gray');
     $('#pause')[0].setAttribute('stroke', 'black');
-  },                 400);
+  },　                400);
 });
 
 let fullscreen = false;
@@ -36,7 +36,7 @@ function getFullscreen() {
   }
   if (document['msFullscreenElement']) {
     return document['msFullscreenElement'];
-  }  (document['fullscreenElement']);
+  }
   return document['fullscreenElement'];
 }
 
@@ -156,13 +156,12 @@ function exitFullscreen() {
   }
 }
 
-document.onkeydown = (evt) => {
-  let isEscape = false;
-  isEscape = (evt.key === 'Escape' || evt.key === 'Esc');
-  if (isEscape) {
+$(document).on('keydown', (evt) => {
+  // KeyCode 27: ESC button
+  if (evt.keyCode === 27) {
     exitFullscreen();
   }
-};
+});
 
 $('#extend').on('click', () => {
   requestFullscreen(arare.getCanvas());
