@@ -20960,9 +20960,9 @@ module.exports = function(module) {
 
 /***/ }),
 
-/***/ "./src/arare2-code.ts":
+/***/ "./src/arare2-code.js":
 /*!****************************!*\
-  !*** ./src/arare2-code.ts ***!
+  !*** ./src/arare2-code.js ***!
   \****************************/
 /*! exports provided: ArareCode */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -20970,96 +20970,99 @@ module.exports = function(module) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ArareCode", function() { return ArareCode; });
+
 var width = 1000;
 var height = 1000;
-var ArareCode = {
-    world: {
-        'width': 1000,
-        'height': 1000,
-        'xGravity': 0.01,
-        'yGravity': 0.01,
-        'mouse': true,
-        'ticker': { 'x': 10, 'y': 10 },
-    },
-    bodies: [
-        {
-            'value': 0,
-        },
-        {
-            'shape': "circle",
-            'concept': ['ボール', '円'],
-            'name': 'ボール',
-            'width': 50,
-            'height': 50,
-            'position': {
-                'x': 500,
-                'y': 500,
-            },
-            'angle': 0.2 * Math.PI,
-            'render': {
-                'fillStyle': 'rgba(11,11,11,0.1)',
-                'strokeStyle': 'blue',
-                'lineWidth': 10
-            },
-            'velocity': { x: 1, y: 1 },
-            'value': "ほげ",
-            'isSensor': true,
-        },
-        {
-            'shape': "rectangle",
-            'concept': ['X', '壁', '長方形'],
-            'isStatic': false,
-            'chamfer': true,
-            'name': 'X',
-            'width': 180,
-            'height': 100,
-            'slop': 0.001,
-            'position': {
-                'x': 200,
-                'y': 300,
-            },
-        },
-        {
-            'shape': "polygon",
-            'concept': ['多角形', '正方形'],
-            'isStatic': false,
-            'chamfer': true,
-            'sides': 6,
-            'name': '多角形',
-            'width': 100,
-            'height': 100,
-            'position': {
-                'x': 400,
-                'y': 500,
-            },
-        },
-        {
-            'shape': "trapezoid",
-            'concept': ['台形'],
-            'isStatic': false,
-            'chamfer': true,
-            'name': 'X',
-            'slop': 0.45,
-            'width': 100,
-            'height': 150,
-            'position': {
-                'x': 100,
-                'y': 700,
-            },
-        },
-        {
-            'value': 2,
-            'name': 'Y',
-        },
-        {
-            'name': 'SCORE',
-            'value': 1,
-            'position': { 'x': 100, 'y': 100 },
-        },
-    ],
-    errors: []
-};
 
+var ArareCode = {
+  world : {
+    'width': 1000,
+    'height': 1000,
+    'xGravity': 0.01,
+    'yGravity': 0.01,
+    'mouse': true,
+    'ticker': { 'x': 10, 'y': 10 },
+  },
+  bodies : [
+    {
+      'value': 0,
+    },
+    {
+      'shape': "circle",
+      'concept': ['ボール', '円'],
+      'name': 'ボール',
+      'width': 50,
+      'height': 50,
+      'position': {
+        'x': 500,
+        'y': 500,
+      },
+      'angle': 0.2 * Math.PI,
+      'render': {
+        'fillStyle': 'rgba(11,11,11,0.1)',
+        'strokeStyle': 'blue',
+        'lineWidth': 10
+      },
+      'velocity': { x: 1, y: 1 },
+      'value': "ほげ",
+      'isSensor': true,
+    },
+    {
+      'shape': "rectangle",
+      'concept': ['X', '壁', '長方形'],
+      'isStatic': false,
+      'chamfer': true,
+      'name': 'X',
+      'width': 180,
+      'height': 100,
+      'slop': 0.001,
+      'position': {
+        'x': 200,
+        'y': 300,
+      },
+    },
+    {
+      'shape': "polygon",
+      'concept': ['多角形','正方形'],
+      'isStatic': false,
+      'chamfer': true,
+      'sides': 6,
+      'name': '多角形',
+      'width': 100,
+      'height': 100,
+      'position': {
+        'x': 400,
+        'y': 500,
+      },
+
+    },
+    {
+      'shape': "trapezoid",
+      'concept': ['台形'],
+      'isStatic': false,
+      'chamfer': true,
+      'name': 'X',
+      'slop': 0.45,
+      'width': 100,
+      'height': 150,
+      'position': {
+        'x': 100,
+        'y': 700,
+      },
+    },
+    {
+      'value': 2,
+      'name': 'Y',
+    },
+    {
+      'name': 'SCORE',
+      'value': 1,
+      'position': { 'x': 100, 'y': 100 },
+    },
+  ],
+  errors : [
+  ]
+}
 
 /***/ }),
 
@@ -21085,9 +21088,16 @@ var MouseConstraint = matter_js__WEBPACK_IMPORTED_MODULE_0__["MouseConstraint"];
 var Mouse = matter_js__WEBPACK_IMPORTED_MODULE_0__["Mouse"];
 var World = matter_js__WEBPACK_IMPORTED_MODULE_0__["World"];
 var Common = matter_js__WEBPACK_IMPORTED_MODULE_0__["Common"];
-//(Arare2, {}) -> (number, number, number) -> any
+// (Arare2, {}) -> (number, number, number) -> any
 var Arare2 = /** @class */ (function () {
     function Arare2(width, height) {
+        var _this = this;
+        this.getWidth = function () { return _this.width; };
+        this.getHeight = function () { return _this.height; };
+        this.getCanvas = function () { return _this.canvas; };
+        this.getRender = function () { return _this.render; };
+        this.getDebug = function () { return _this.debug; };
+        this.setDebug = function (debug) { _this.debug = debug; };
         this.width = width;
         this.height = height;
         // create an engine
@@ -21096,7 +21106,7 @@ var Arare2 = /** @class */ (function () {
         this.runner = Runner.create({});
         var renderOptions = {
             /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
-            element: document.getElementById("canvas"),
+            element: document.getElementById('canvas'),
             engine: this.engine,
             options: {
                 /* オブジェクトが枠線のみになる */
@@ -21113,24 +21123,6 @@ var Arare2 = /** @class */ (function () {
         this.width = width;
         this.height = height;
     };
-    Arare2.prototype.getWidth = function () {
-        return this.width;
-    };
-    Arare2.prototype.getHeight = function () {
-        return this.height;
-    };
-    Arare2.prototype.getCanvas = function () {
-        return this.canvas;
-    };
-    Arare2.prototype.getRender = function () {
-        return this.render;
-    };
-    Arare2.prototype.getDebug = function () {
-        return this.debug;
-    };
-    Arare2.prototype.setDebug = function (debug) {
-        this.debug = debug;
-    };
     Arare2.prototype.ready = function () {
         Runner.run(this.runner, this.engine);
         / *物理エンジンを動かす * /;
@@ -21139,11 +21131,11 @@ var Arare2 = /** @class */ (function () {
         / *初期位置を描画したら一度止める * /;
     };
     Arare2.prototype.start = function () {
-        //console.log("start");
+        // console.log("start");
         this.runner.enabled = true;
     };
     Arare2.prototype.pause = function () {
-        //console.log("pause");
+        // console.log("pause");
         this.runner.enabled = false;
     };
     Arare2.prototype.dispose = function () {
@@ -21152,16 +21144,16 @@ var Arare2 = /** @class */ (function () {
             this.runner = null;
         }
         if (this.engine) {
-            //Matter.World.clear(this.engine.world);
+            // Matter.World.clear(this.engine.world);
             Engine.clear(this.engine);
             this.engine = null;
         }
         if (this.render) {
             Render.stop(this.render);
             // render.canvas.remove();
-            //render.canvas = null;
-            //render.context = null;
-            //render.textures = {};
+            // render.canvas = null;
+            // render.context = null;
+            // render.textures = {};
         }
     };
     Arare2.prototype.load = function (code) {
@@ -21171,8 +21163,8 @@ var Arare2 = /** @class */ (function () {
                 min: { x: 0, y: 0 },
                 max: {
                     x: world.width || 1000,
-                    y: world.height || 1000
-                }
+                    y: world.height || 1000,
+                },
             });
             /* マウス */
             if (world.mouse || true) {
@@ -21183,15 +21175,15 @@ var Arare2 = /** @class */ (function () {
                     stiffness: world.mouseStiffness || 0.2,
                 };
                 constraintOptions['render'] = {
-                    visible: world.mouseVisible || false
+                    visible: world.mouseVisible || false,
                 };
                 var mouseConstraint = MouseConstraint.create(this.engine, {
                     mouse: mouse,
-                    constraint: Constraint.create(constraintOptions)
+                    constraint: Constraint.create(constraintOptions),
                 });
                 World.add(this.engine.world, mouseConstraint);
                 this.render['mouse'] = mouse;
-                //this.render.mouse = mouse;
+                // this.render.mouse = mouse;
                 // an example of using mouse events on a mouse
                 /*
                 Events.on(mouseConstraint, 'mousedown', function(event) {
@@ -21199,31 +21191,31 @@ var Arare2 = /** @class */ (function () {
                   console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
                   //shakeScene(engine);
                 });
-               
+        
                 // an example of using mouse events on a mouse
                 Events.on(mouseConstraint, 'mouseup', function(event) {
                   var mousePosition = event.mouse.position;
                   console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
                 });
-               
+        
                 // an example of using mouse events on a mouse
                 Events.on(mouseConstraint, 'startdrag', function(event) {
                   console.log('startdrag', event);
                 });
-               
+        
                 // an example of using mouse events on a mouse
                 Events.on(mouseConstraint, 'enddrag', function(event) {
                   console.log('enddrag', event);
                 });
                 */
             }
-            var engine = this.engine;
-            engine.world.gravity.x = world.xGravity || 0;
-            engine.world.gravity.y = world.yGravity || 0;
+            var engine_1 = this.engine;
+            engine_1.world.gravity.x = world.xGravity || 0;
+            engine_1.world.gravity.y = world.yGravity || 0;
             if (world.yGravity) {
                 window.addEventListener('deviceorientation', function (event) {
                     var orientation = window.orientation || 0;
-                    var gravity = engine.world.gravity;
+                    var gravity = engine_1.world.gravity;
                     if (orientation === 0) {
                         gravity.x = Common.clamp(event.gamma, -90, 90) / 90;
                         gravity.y = Common.clamp(event.beta, -90, 90) / 90;
@@ -21244,7 +21236,7 @@ var Arare2 = /** @class */ (function () {
             }
         } /* world */
         if (code.errors) {
-            //this.notify(this, code.errors);
+            // this.notify(this, code.errors);
         }
         if (code.bodies) {
             var bodies = [];
@@ -21281,16 +21273,17 @@ var Arare2 = /** @class */ (function () {
         }
     };
     Arare2.prototype.compile = function (inputs) {
+        var _this = this;
         try {
             $.ajax({
                 url: '/compile',
                 type: 'POST',
                 data: {
-                    source: inputs
+                    source: inputs,
                 },
                 timeout: 5000,
             }).done(function (data) {
-                this.load(data);
+                _this.load(data);
             }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
                 console.log("XMLHttpRequest : " + XMLHttpRequest);
                 console.log(errorThrown);
@@ -21307,9 +21300,9 @@ var Arare2 = /** @class */ (function () {
 }());
 
 /* shapeFunc 物体の形状から物体を生成する関数 */
-//(Arare2, {}) -> (number, number, number) -> any
+// (Arare2, {}) -> (number, number, number) -> any
 var shapeFuncMap = {
-    "circle": function (ctx, options) {
+    circle: function (ctx, options) {
         return function (x, y, index) {
             var radius = options['radius'] || 25;
             if (options['width']) {
@@ -21318,12 +21311,12 @@ var shapeFuncMap = {
             return Bodies.circle(x, y, radius, options);
         };
     },
-    "rectangle": function (ctx, options) {
+    rectangle: function (ctx, options) {
         return function (x, y, index) {
             return Bodies.rectangle(x, y, options['width'] || 100, options['height'] || 100, options);
         };
     },
-    "polygon": function (ctx, options) {
+    polygon: function (ctx, options) {
         return function (x, y, index) {
             var radius = options['radius'] || 25;
             if (options['width']) {
@@ -21332,12 +21325,12 @@ var shapeFuncMap = {
             return matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"].polygon(x, y, options['sides'] || 5, radius, options);
         };
     },
-    "trapezoid": function (ctx, options) {
+    trapezoid: function (ctx, options) {
         return function (x, y, index) {
             return matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"].trapezoid(x, y, options['width'] || 100, options['height'] || 100, options['slope'] || 0.5, options);
         };
     },
-    "unknown": function (ctx, options) {
+    unknown: function (ctx, options) {
         return function (x, y, index) {
             var radius = options['radius'] || 25;
             if (options['width']) {
@@ -21345,17 +21338,17 @@ var shapeFuncMap = {
             }
             return Bodies.circle(x, y, radius, options);
         };
-    }
+    },
 };
 var shapeFunc = function (code, options) {
     var shape = options['shape'] || 'unknown';
     if (code.shapeFuncMap && code.shapeFuncMap[shape]) {
         return code.shapeFuncMap[shape];
     }
-    else if (shapeFuncMap[shape]) {
+    if (shapeFuncMap[shape]) {
         return shapeFuncMap[shape];
     }
-    return shapeFuncMap["unknown"];
+    return shapeFuncMap['unknown'];
 };
 
 
@@ -21373,7 +21366,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _arare2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./arare2 */ "./src/arare2.ts");
-/* harmony import */ var _arare2_code__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./arare2-code */ "./src/arare2-code.ts");
+/* harmony import */ var _arare2_code__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./arare2-code */ "./src/arare2-code.js");
 /* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/ace.js */ "./node_modules/ace-builds/src-min-noconflict/ace.js");
 /* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js */ "./node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js");
@@ -21385,18 +21378,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /* editor */
 var arare = new _arare2__WEBPACK_IMPORTED_MODULE_1__["Arare2"](500, 500);
-var editor = _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__["edit"]("editor");
+var editor = _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__["edit"]('editor');
 editor.setTheme(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__);
 editor.getSession().setUseWrapMode(true); /* 折り返しあり */
-//editor.setFontSize(24);
+// editor.setFontSize(24);
 var timer = null;
-editor.on("change", function (cm, obj) {
+editor.on('change', function (cm, obj) {
     if (timer) {
         clearTimeout(timer);
         timer = null;
     }
     timer = setTimeout(function () {
-        //arare.compile(editor.getValue());
+        // arare.compile(editor.getValue());
         arare.load(_arare2_code__WEBPACK_IMPORTED_MODULE_2__["ArareCode"]);
         jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
         jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
@@ -21407,15 +21400,13 @@ function getFullscreen() {
     if (document['webkitFullscreenElement']) {
         return document['webkitFullscreenElement'];
     }
-    else if (document['mozFullScreenElement']) {
+    if (document['mozFullScreenElement']) {
         return document['mozFullScreenElement'];
     }
-    else if (document['msFullscreenElement']) {
+    if (document['msFullscreenElement']) {
         return document['msFullscreenElement'];
     }
-    else if (document['fullscreenElement']) {
-        return document['fullscreenElement'];
-    }
+    return document['fullscreenElement'];
 }
 function resizeMe() {
     var w = jquery__WEBPACK_IMPORTED_MODULE_0__(window).width();
@@ -21446,24 +21437,24 @@ function resizeMe() {
 }
 jquery__WEBPACK_IMPORTED_MODULE_0__(window).on('load', resizeMe);
 jquery__WEBPACK_IMPORTED_MODULE_0__(window).on('resize', resizeMe);
-jquery__WEBPACK_IMPORTED_MODULE_0__('#play').on("click", function () {
+jquery__WEBPACK_IMPORTED_MODULE_0__('#play').on('click', function () {
     arare.start();
     jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
     jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
 });
 jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'gray');
-jquery__WEBPACK_IMPORTED_MODULE_0__('#pause').on("click", function () {
+jquery__WEBPACK_IMPORTED_MODULE_0__('#pause').on('click', function () {
     arare.pause();
     jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'black');
     jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'gray');
 });
-jquery__WEBPACK_IMPORTED_MODULE_0__('#reload').on("click", function () {
+jquery__WEBPACK_IMPORTED_MODULE_0__('#reload').on('click', function () {
     arare.load(_arare2_code__WEBPACK_IMPORTED_MODULE_2__["ArareCode"]);
     jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
     jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
 });
 var background = 'rgba(0, 0, 0, 0)';
-jquery__WEBPACK_IMPORTED_MODULE_0__('#debug').on("click", function () {
+jquery__WEBPACK_IMPORTED_MODULE_0__('#debug').on('click', function () {
     if (arare.getDebug()) {
         var render = arare.getRender();
         render.options.wireframes = false;
@@ -21489,56 +21480,55 @@ jquery__WEBPACK_IMPORTED_MODULE_0__('#debug').on("click", function () {
         arare.setDebug(true);
     }
 });
-jquery__WEBPACK_IMPORTED_MODULE_0__('#font-plus').on("click", function () {
+jquery__WEBPACK_IMPORTED_MODULE_0__('#font-plus').on('click', function () {
     console.log(editor.getFontSize());
     editor.setFontSize(editor.getFontSize() + 2);
 });
-jquery__WEBPACK_IMPORTED_MODULE_0__('#font-minus').on("click", function () {
+jquery__WEBPACK_IMPORTED_MODULE_0__('#font-minus').on('click', function () {
     editor.setFontSize(Math.max(8, editor.getFontSize() - 2));
 });
 function requestFullscreen(target) {
     if (target.webkitRequestFullscreen) {
-        target.webkitRequestFullscreen(); //Chrome15+, Safari5.1+, Opera15+
+        target.webkitRequestFullscreen(); // Chrome15+, Safari5.1+, Opera15+
     }
     else if (target.mozRequestFullScreen) {
-        target.mozRequestFullScreen(); //FF10+
+        target.mozRequestFullScreen(); // FF10+
     }
     else if (target.msRequestFullscreen) {
-        target.msRequestFullscreen(); //IE11+
+        target.msRequestFullscreen(); // IE11+
     }
     else if (target.requestFullscreen) {
         target.requestFullscreen(); // HTML5 Fullscreen API仕様
     }
     else {
-        //alert('ご利用のブラウザはフルスクリーン操作に対応していません');
+        // alert('ご利用のブラウザはフルスクリーン操作に対応していません');
         return;
     }
 }
 function exitFullscreen() {
     if (document['webkitCancelFullScreen']) {
-        document['webkitCancelFullScreen'](); //Chrome15+, Safari5.1+, Opera15+
+        document['webkitCancelFullScreen'](); // Chrome15+, Safari5.1+, Opera15+
     }
     else if (document['mozCancelFullScreen']) {
-        document['mozCancelFullScreen'](); //FF10+
+        document['mozCancelFullScreen'](); // FF10+
     }
     else if (document['msExitFullscreen']) {
-        document['msExitFullscreen'](); //IE11+
+        document['msExitFullscreen'](); // IE11+
     }
     else if (document['cancelFullScreen']) {
-        document['cancelFullScreen'](); //Gecko:FullScreenAPI仕様
+        document['cancelFullScreen'](); // Gecko:FullScreenAPI仕様
     }
     else if (document.exitFullscreen) {
         document.exitFullscreen(); // HTML5 Fullscreen API仕様
     }
 }
-document.onkeydown = function (evt) {
-    var isEscape = false;
-    isEscape = (evt.key == "Escape" || evt.key == "Esc");
-    if (isEscape) {
+jquery__WEBPACK_IMPORTED_MODULE_0__(document).on('keydown', function (evt) {
+    // KeyCode 27: ESC button
+    if (evt.keyCode === 27) {
         exitFullscreen();
     }
-};
-jquery__WEBPACK_IMPORTED_MODULE_0__('#extend').on("click", function () {
+});
+jquery__WEBPACK_IMPORTED_MODULE_0__('#extend').on('click', function () {
     requestFullscreen(arare.getCanvas());
 });
 arare.load(_arare2_code__WEBPACK_IMPORTED_MODULE_2__["ArareCode"]);

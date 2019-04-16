@@ -1,25 +1,25 @@
 import * as Matter from 'matter-js';
 
-let Bodies = Matter.Bodies;
-let Engine = Matter.Engine;
-let Runner = Matter.Runner;
-let Render = Matter.Render;
-let Constraint = Matter.Constraint;
-let MouseConstraint = Matter.MouseConstraint;
-let Mouse = Matter.Mouse;
-let World = Matter.World;
-let Common = Matter['Common'];
+const Bodies = Matter.Bodies;
+const Engine = Matter.Engine;
+const Runner = Matter.Runner;
+const Render = Matter.Render;
+const Constraint = Matter.Constraint;
+const MouseConstraint = Matter.MouseConstraint;
+const Mouse = Matter.Mouse;
+const World = Matter.World;
+const Common = Matter['Common'];
 
-//import {Code} from './arare2-code';
+// import {Code} from './arare2-code';
 export type Code = {
   world: any,
   bodies: any[],
   errors?: {}[],
   rules?: any,
-  shapeFuncMap?: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any }
-}
+  shapeFuncMap?: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any },
+};
 
-//(Arare2, {}) -> (number, number, number) -> any
+// (Arare2, {}) -> (number, number, number) -> any
 
 export class Arare2 {
   protected width: number;
@@ -41,9 +41,9 @@ export class Arare2 {
     this.engine = Engine.create();
     /* engineのアクティブ、非アクティブの制御を行う */
     this.runner = Runner.create({});
-    var renderOptions = {
+    const renderOptions = {
       /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
-      element: document.getElementById("canvas"),
+      element: document.getElementById('canvas'),
       engine: this.engine,
       options: {
         /* オブジェクトが枠線のみになる */
@@ -51,58 +51,46 @@ export class Arare2 {
         height: this.height,
         background: 'rgba(0, 0, 0, 0)',
         wireframes: false,
-        //showDebug: world.debug || false,
-        //showPositions: world.debug || false,
-        //showMousePositions: world.debug || false,
-        //debugString: "hoge\nこまったなあ",
+        // showDebug: world.debug || false,
+        // showPositions: world.debug || false,
+        // showMousePositions: world.debug || false,
+        // debugString: "hoge\nこまったなあ",
       },
-    }
+    };
     this.render = Render.create(renderOptions);
     this.canvas = this.render.canvas;
   }
 
   public set_window_size(width: number, height: number) {
-    this.width = width
-    this.height = height
+    this.width = width;
+    this.height = height;
   }
 
-  public getWidth(): number {
-    return this.width
-  }
+  public getWidth = (): number => { return this.width; };
 
-  public getHeight(): number {
-    return this.height
-  }
+  public getHeight = (): number => { return this.height; };
 
-  public getCanvas(): HTMLCanvasElement {
-    return this.canvas
-  }
+  public getCanvas = (): HTMLCanvasElement => { return this.canvas; };
 
-  public getRender(): Matter.Render {
-    return this.render
-  }
+  public getRender = (): Matter.Render => { return this.render; };
 
-  public getDebug(): boolean {
-    return this.debug
-  }
+  public getDebug = (): boolean => { return this.debug; };
 
-  public setDebug(debug: boolean) {
-    this.debug = debug
-  }
+  public setDebug = (debug: boolean) => { this.debug = debug; };
 
   public ready() {
-    Runner.run(this.runner, this.engine); / *物理エンジンを動かす * /
+    Runner.run(this.runner, this.engine); / *物理エンジンを動かす * /;
     Render.run(this.render); /* 描画開始 */
-    this.runner.enabled = false; / *初期位置を描画したら一度止める * /
+    this.runner.enabled = false;  / *初期位置を描画したら一度止める * /;
   }
 
   public start() {
-    //console.log("start");
+    // console.log("start");
     this.runner.enabled = true;
   }
 
   public pause() {
-    //console.log("pause");
+    // console.log("pause");
     this.runner.enabled = false;
   }
 
@@ -112,48 +100,48 @@ export class Arare2 {
       this.runner = null;
     }
     if (this.engine) {
-      //Matter.World.clear(this.engine.world);
+      // Matter.World.clear(this.engine.world);
       Engine.clear(this.engine);
       this.engine = null;
     }
     if (this.render) {
       Render.stop(this.render);
       // render.canvas.remove();
-      //render.canvas = null;
-      //render.context = null;
-      //render.textures = {};
+      // render.canvas = null;
+      // render.context = null;
+      // render.textures = {};
     }
   }
 
   public load(code: Code) {
     if (code.world) {
-      var world = code.world;
+      const world = code.world;
       Render['lookAt'](this.render, {
         min: { x: 0, y: 0 },
         max: {
           x: world.width || 1000,
-          y: world.height || 1000
-        }
+          y: world.height || 1000,
+        },
       });
       /* マウス */
       if (world.mouse || true) {
-        var mouse = Mouse.create(this.render.canvas);
-        var constraintOptions = {
+        const mouse = Mouse.create(this.render.canvas);
+        const constraintOptions = {
           pointA: { x: 0, y: 0 },
           pointB: { x: 0, y: 0 },
           stiffness: world.mouseStiffness || 0.2,  /* 剛性 */
         };
         constraintOptions['render'] = {
-          visible: world.mouseVisible || false
+          visible: world.mouseVisible || false,
         };
-        var mouseConstraint = MouseConstraint.create(this.engine, {
-          mouse: mouse,
-          constraint: Constraint.create(constraintOptions)
+        const mouseConstraint = MouseConstraint.create(this.engine, {
+          mouse,
+          constraint: Constraint.create(constraintOptions),
         });
 
         World.add(this.engine.world, mouseConstraint);
         this.render['mouse'] = mouse;
-        //this.render.mouse = mouse;
+        // this.render.mouse = mouse;
 
         // an example of using mouse events on a mouse
         /*
@@ -162,31 +150,31 @@ export class Arare2 {
           console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
           //shakeScene(engine);
         });
-       
+
         // an example of using mouse events on a mouse
         Events.on(mouseConstraint, 'mouseup', function(event) {
           var mousePosition = event.mouse.position;
           console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
         });
-       
+
         // an example of using mouse events on a mouse
         Events.on(mouseConstraint, 'startdrag', function(event) {
           console.log('startdrag', event);
         });
-       
+
         // an example of using mouse events on a mouse
         Events.on(mouseConstraint, 'enddrag', function(event) {
           console.log('enddrag', event);
         });
         */
       }
-      var engine = this.engine;
+      const engine = this.engine;
       engine.world.gravity.x = world.xGravity || 0;
       engine.world.gravity.y = world.yGravity || 0;
       if (world.yGravity) {
-        window.addEventListener('deviceorientation', function (event) {
-          var orientation = window.orientation || 0;
-          var gravity = engine.world.gravity;
+        window.addEventListener('deviceorientation', (event) => {
+          const orientation = window.orientation || 0;
+          const gravity = engine.world.gravity;
           if (orientation === 0) {
             gravity.x = Common.clamp(event.gamma, -90, 90) / 90;
             gravity.y = Common.clamp(event.beta, -90, 90) / 90;
@@ -204,15 +192,15 @@ export class Arare2 {
       }
     } /* world */
     if (code.errors) {
-      //this.notify(this, code.errors);
+      // this.notify(this, code.errors);
     }
     if (code.bodies) {
-      var bodies = [];
+      const bodies = [];
       this.vars = {};
-      for (var data of code.bodies) {
+      for (const data of code.bodies) {
         if (data.shape && data.position) {
-          var shape = shapeFunc(code, data)(this, data);
-          var body = shape(data.position.x, data.position.y, -1);
+          const shape = shapeFunc(code, data)(this, data);
+          const body = shape(data.position.x, data.position.y, -1);
           if (data.name) {
             this.vars[data.name] = body;
           }
@@ -245,20 +233,19 @@ export class Arare2 {
         url: '/compile',
         type: 'POST',
         data: {
-          source: inputs
+          source: inputs,
         },
         timeout: 5000,
-      }).done(function (data) {
+      }).done((data) => {
         this.load(data);
-      }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
-        console.log("XMLHttpRequest : " + XMLHttpRequest);
+      }).fail((XMLHttpRequest, textStatus, errorThrown) => {
+        console.log(`XMLHttpRequest : ${XMLHttpRequest}`);
         console.log(errorThrown);
         console.log(textStatus);
       }).always((data) => {
         console.log(data);
       });
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e); // FIXME
     }
   }
@@ -267,54 +254,55 @@ export class Arare2 {
 
 /* shapeFunc 物体の形状から物体を生成する関数 */
 
-//(Arare2, {}) -> (number, number, number) -> any
+// (Arare2, {}) -> (number, number, number) -> any
 
-let shapeFuncMap: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any } = {
-  "circle": function (ctx: Arare2, options: {}) {
+const shapeFuncMap: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => Matter.Body } = {
+  circle (ctx: Arare2, options: {}) {
     return function (x, y, index) {
-      var radius = options['radius'] || 25;
+      let radius = options['radius'] || 25;
       if (options['width']) {
         radius = options['width'] / 2;
       }
       return Bodies.circle(x, y, radius, options);
-    }
+    };
   },
-  "rectangle": function (ctx: Arare2, options: {}) {
+  rectangle (ctx: Arare2, options: {}) {
     return function (x, y, index) {
       return Bodies.rectangle(x, y, options['width'] || 100, options['height'] || 100, options);
-    }
+    };
   },
-  "polygon": function(ctx: Arare2, options: {}) {
-    return function(x, y, index) {
-      var radius = options['radius'] || 25;
+  polygon(ctx: Arare2, options: {}) {
+    return function (x, y, index) {
+      let radius = options['radius'] || 25;
       if (options['width']) {
-          radius = options['width'] / 2;
+        radius = options['width'] / 2;
       }
       return Matter.Bodies.polygon(x, y, options['sides'] || 5, radius, options);
-    }
+    };
   },
-  "trapezoid": function(ctx: Arare2, options: {}) {
-    return function(x, y, index) {
-      return Matter.Bodies.trapezoid(x, y, options['width'] || 100, options['height'] || 100, options['slope'] || 0.5, options);
-    }
-  },
-  "unknown": function (ctx: Arare2, options: {}) {
+  trapezoid(ctx: Arare2, options: {}) {
     return function (x, y, index) {
-      var radius = options['radius'] || 25;
+      return Matter.Bodies.trapezoid(x, y, options['width'] || 100, options['height'] || 100, options['slope'] || 0.5, options);
+    };
+  },
+  unknown (ctx: Arare2, options: {}) {
+    return function (x, y, index) {
+      let radius = options['radius'] || 25;
       if (options['width']) {
         radius = options['width'] / 2;
       }
       return Bodies.circle(x, y, radius, options);
-    }
-  }
-}
+    };
+  },
+};
 
-let shapeFunc = (code: Code, options: {}) => {
-  var shape = options['shape'] || 'unknown';
+const shapeFunc = (code: Code, options: {}) => {
+  const shape = options['shape'] || 'unknown';
   if (code.shapeFuncMap && code.shapeFuncMap[shape]) {
     return code.shapeFuncMap[shape];
-  } else if (shapeFuncMap[shape]) {
+  }
+  if (shapeFuncMap[shape]) {
     return shapeFuncMap[shape];
   }
-  return shapeFuncMap["unknown"];
-}
+  return shapeFuncMap['unknown'];
+};

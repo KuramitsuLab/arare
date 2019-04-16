@@ -1,4 +1,4 @@
-const path = require('path')
+const path = require('path');
 
 module.exports = {
   // モード値を production に設定すると最適化された状態で、
@@ -17,8 +17,18 @@ module.exports = {
       {
         // 拡張子 .ts の場合
         test: /\.ts$/,
+        exclude: /node_modules/,
         // TypeScript をコンパイルする
-        use: 'ts-loader'
+        use: [
+          { loader: "ts-loader" },
+          {
+            loader: 'tslint-loader',
+            options: {
+              typeCheck: true,
+              fix: true,
+            },
+          },
+        ],
       }
     ]
   },
