@@ -20978,8 +20978,8 @@ var ArareCode = {
   world : {
     'width': 1000,
     'height': 1000,
-    'xGravity': 1,
-    'yGravity': 1,
+    'xGravity': 0.01,
+    'yGravity': 0.01,
     'mouse': true,
     'ticker': { 'x': 10, 'y': 10 },
   },
@@ -20998,7 +20998,11 @@ var ArareCode = {
         'y': 500,
       },
       'angle': 0.2 * Math.PI,
-      'fillStyle': 'rgba(11,11,11,0.1)',
+      'render': {
+        'fillStyle': 'rgba(11,11,11,0.1)',
+        'strokeStyle': 'blue',
+        'lineWidth': 10
+      },
       'velocity': { x: 1, y: 1 },
       'value': "ほげ",
       'isSensor': true,
@@ -21006,7 +21010,7 @@ var ArareCode = {
     {
       'shape': "rectangle",
       'concept': ['X', '壁', '長方形'],
-      'isStatic': true,
+      'isStatic': false,
       'chamfer': true,
       'name': 'X',
       'slop': 0.001,
@@ -21018,7 +21022,7 @@ var ArareCode = {
     {
       'shape': "polygon",
       'concept': ['多角形'],
-      'isStatic': true,
+      'isStatic': false,
       'chamfer': true,
       'sides': 6,
       'name': '多角形',
@@ -21030,7 +21034,7 @@ var ArareCode = {
     {
       'shape': "trapezoid",
       'concept': ['台形'],
-      'isStatic': true,
+      'isStatic': false,
       'chamfer': true,
       'name': 'X',
       'slop': 0.45,
@@ -21072,14 +21076,21 @@ var Bodies = matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"];
 var Engine = matter_js__WEBPACK_IMPORTED_MODULE_0__["Engine"];
 var Runner = matter_js__WEBPACK_IMPORTED_MODULE_0__["Runner"];
 var Render = matter_js__WEBPACK_IMPORTED_MODULE_0__["Render"];
+var Constraint = matter_js__WEBPACK_IMPORTED_MODULE_0__["Constraint"];
 var MouseConstraint = matter_js__WEBPACK_IMPORTED_MODULE_0__["MouseConstraint"];
 var Mouse = matter_js__WEBPACK_IMPORTED_MODULE_0__["Mouse"];
 var World = matter_js__WEBPACK_IMPORTED_MODULE_0__["World"];
-var Constraint = matter_js__WEBPACK_IMPORTED_MODULE_0__["Constraint"];
 var Common = matter_js__WEBPACK_IMPORTED_MODULE_0__["Common"];
 // (Arare2, {}) -> (number, number, number) -> any
 var Arare2 = /** @class */ (function () {
     function Arare2(width, height) {
+        var _this = this;
+        this.getWidth = function () { return _this.width; };
+        this.getHeight = function () { return _this.height; };
+        this.getCanvas = function () { return _this.canvas; };
+        this.getRender = function () { return _this.render; };
+        this.getDebug = function () { return _this.debug; };
+        this.setDebug = function (debug) { _this.debug = debug; };
         this.width = width;
         this.height = height;
         // create an engine
@@ -21104,24 +21115,6 @@ var Arare2 = /** @class */ (function () {
     Arare2.prototype.set_window_size = function (width, height) {
         this.width = width;
         this.height = height;
-    };
-    Arare2.prototype.getWidth = function () {
-        return this.width;
-    };
-    Arare2.prototype.getHeight = function () {
-        return this.height;
-    };
-    Arare2.prototype.getCanvas = function () {
-        return this.canvas;
-    };
-    Arare2.prototype.getRender = function () {
-        return this.render;
-    };
-    Arare2.prototype.getDebug = function () {
-        return this.debug;
-    };
-    Arare2.prototype.setDebug = function (debug) {
-        this.debug = debug;
     };
     Arare2.prototype.ready = function () {
         Runner.run(this.runner, this.engine);
@@ -21182,29 +21175,30 @@ var Arare2 = /** @class */ (function () {
                     constraint: Constraint.create(constraintOptions),
                 });
                 World.add(this.engine.world, mouseConstraint);
+                this.render['mouse'] = mouse;
                 // this.render.mouse = mouse;
                 // an example of using mouse events on a mouse
                 /*
                 Events.on(mouseConstraint, 'mousedown', function(event) {
-                    var mousePosition = event.mouse.position;
-                    console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
-                    //shakeScene(engine);
+                  var mousePosition = event.mouse.position;
+                  console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
+                  //shakeScene(engine);
                 });
         
                 // an example of using mouse events on a mouse
                 Events.on(mouseConstraint, 'mouseup', function(event) {
-                    var mousePosition = event.mouse.position;
-                    console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
+                  var mousePosition = event.mouse.position;
+                  console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
                 });
         
                 // an example of using mouse events on a mouse
                 Events.on(mouseConstraint, 'startdrag', function(event) {
-                    console.log('startdrag', event);
+                  console.log('startdrag', event);
                 });
         
                 // an example of using mouse events on a mouse
                 Events.on(mouseConstraint, 'enddrag', function(event) {
-                    console.log('enddrag', event);
+                  console.log('enddrag', event);
                 });
                 */
             }
@@ -21405,7 +21399,6 @@ function getFullscreen() {
     if (document['msFullscreenElement']) {
         return document['msFullscreenElement'];
     }
-    (document['fullscreenElement']);
     return document['fullscreenElement'];
 }
 function resizeMe() {
@@ -21522,13 +21515,12 @@ function exitFullscreen() {
         document.exitFullscreen(); // HTML5 Fullscreen API仕様
     }
 }
-document.onkeydown = function (evt) {
-    var isEscape = false;
-    isEscape = (evt.key === 'Escape' || evt.key === 'Esc');
-    if (isEscape) {
+jquery__WEBPACK_IMPORTED_MODULE_0__(document).on('keydown', function (evt) {
+    // KeyCode 27: ESC button
+    if (evt.keyCode === 27) {
         exitFullscreen();
     }
-};
+});
 jquery__WEBPACK_IMPORTED_MODULE_0__('#extend').on('click', function () {
     requestFullscreen(arare.getCanvas());
 });

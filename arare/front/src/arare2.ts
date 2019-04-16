@@ -4,10 +4,10 @@ const Bodies = Matter.Bodies;
 const Engine = Matter.Engine;
 const Runner = Matter.Runner;
 const Render = Matter.Render;
+const Constraint = Matter.Constraint;
 const MouseConstraint = Matter.MouseConstraint;
 const Mouse = Matter.Mouse;
 const World = Matter.World;
-const Constraint = Matter.Constraint;
 const Common = Matter['Common'];
 
 // import {Code} from './arare2-code';
@@ -140,30 +140,31 @@ export class Arare2 {
         });
 
         World.add(this.engine.world, mouseConstraint);
+        this.render['mouse'] = mouse;
         // this.render.mouse = mouse;
 
         // an example of using mouse events on a mouse
         /*
         Events.on(mouseConstraint, 'mousedown', function(event) {
-            var mousePosition = event.mouse.position;
-            console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
-            //shakeScene(engine);
+          var mousePosition = event.mouse.position;
+          console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
+          //shakeScene(engine);
         });
 
         // an example of using mouse events on a mouse
         Events.on(mouseConstraint, 'mouseup', function(event) {
-            var mousePosition = event.mouse.position;
-            console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
+          var mousePosition = event.mouse.position;
+          console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
         });
 
         // an example of using mouse events on a mouse
         Events.on(mouseConstraint, 'startdrag', function(event) {
-            console.log('startdrag', event);
+          console.log('startdrag', event);
         });
 
         // an example of using mouse events on a mouse
         Events.on(mouseConstraint, 'enddrag', function(event) {
-            console.log('enddrag', event);
+          console.log('enddrag', event);
         });
         */
       }
