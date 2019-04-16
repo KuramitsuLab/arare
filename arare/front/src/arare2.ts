@@ -4,6 +4,7 @@ let Bodies = Matter.Bodies;
 let Engine = Matter.Engine;
 let Runner = Matter.Runner;
 let Render = Matter.Render;
+let Constraint = Matter.Constraint;
 let MouseConstraint = Matter.MouseConstraint;
 let Mouse = Matter.Mouse;
 let World = Matter.World;
@@ -145,36 +146,37 @@ export class Arare2 {
         constraintOptions['render'] = {
           visible: world.mouseVisible || false
         };
-        var mouseConstraint = Matter.MouseConstraint.create(this.engine, {
+        var mouseConstraint = MouseConstraint.create(this.engine, {
           mouse: mouse,
-          constraint: Matter.Constraint.create(constraintOptions)
+          constraint: Constraint.create(constraintOptions)
         });
 
         World.add(this.engine.world, mouseConstraint);
+        this.render['mouse'] = mouse;
         //this.render.mouse = mouse;
 
         // an example of using mouse events on a mouse
         /*
         Events.on(mouseConstraint, 'mousedown', function(event) {
-            var mousePosition = event.mouse.position;
-            console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
-            //shakeScene(engine);
+          var mousePosition = event.mouse.position;
+          console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
+          //shakeScene(engine);
         });
- 
+       
         // an example of using mouse events on a mouse
         Events.on(mouseConstraint, 'mouseup', function(event) {
-            var mousePosition = event.mouse.position;
-            console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
+          var mousePosition = event.mouse.position;
+          console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
         });
- 
+       
         // an example of using mouse events on a mouse
         Events.on(mouseConstraint, 'startdrag', function(event) {
-            console.log('startdrag', event);
+          console.log('startdrag', event);
         });
- 
+       
         // an example of using mouse events on a mouse
         Events.on(mouseConstraint, 'enddrag', function(event) {
-            console.log('enddrag', event);
+          console.log('enddrag', event);
         });
         */
       }

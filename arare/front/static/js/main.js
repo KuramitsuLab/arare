@@ -20976,8 +20976,8 @@ var ArareCode = {
     world: {
         'width': 1000,
         'height': 1000,
-        'xGravity': 1,
-        'yGravity': 1,
+        'xGravity': 0.01,
+        'yGravity': 0.01,
         'mouse': true,
         'ticker': { 'x': 10, 'y': 10 },
     },
@@ -20992,11 +20992,15 @@ var ArareCode = {
             'width': 50,
             'height': 50,
             'position': {
-                'x': 50,
+                'x': 500,
                 'y': 500,
             },
             'angle': 0.2 * Math.PI,
-            'fillStyle': 'rgba(11,11,11,0.1)',
+            'render': {
+                'fillStyle': 'rgba(11,11,11,0.1)',
+                'strokeStyle': 'blue',
+                'lineWidth': 10
+            },
             'velocity': { x: 1, y: 1 },
             'value': "ほげ",
             'isSensor': true,
@@ -21004,13 +21008,37 @@ var ArareCode = {
         {
             'shape': "rectangle",
             'concept': ['X', '壁', '長方形'],
-            'isStatic': true,
+            'isStatic': false,
             'chamfer': true,
             'name': 'X',
             'slop': 0.001,
             'position': {
-                'x': width * 0 / 100,
-                'y': height * 98 / 100,
+                'x': 200,
+                'y': 300,
+            },
+        },
+        {
+            'shape': "polygon",
+            'concept': ['多角形'],
+            'isStatic': false,
+            'chamfer': true,
+            'sides': 6,
+            'name': '多角形',
+            'position': {
+                'x': 100,
+                'y': 300,
+            },
+        },
+        {
+            'shape': "trapezoid",
+            'concept': ['台形'],
+            'isStatic': false,
+            'chamfer': true,
+            'name': 'X',
+            'slop': 0.45,
+            'position': {
+                'x': 50,
+                'y': 700,
             },
         },
         {
@@ -21046,6 +21074,7 @@ var Bodies = matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"];
 var Engine = matter_js__WEBPACK_IMPORTED_MODULE_0__["Engine"];
 var Runner = matter_js__WEBPACK_IMPORTED_MODULE_0__["Runner"];
 var Render = matter_js__WEBPACK_IMPORTED_MODULE_0__["Render"];
+var Constraint = matter_js__WEBPACK_IMPORTED_MODULE_0__["Constraint"];
 var MouseConstraint = matter_js__WEBPACK_IMPORTED_MODULE_0__["MouseConstraint"];
 var Mouse = matter_js__WEBPACK_IMPORTED_MODULE_0__["Mouse"];
 var World = matter_js__WEBPACK_IMPORTED_MODULE_0__["World"];
@@ -21150,34 +21179,35 @@ var Arare2 = /** @class */ (function () {
                 constraintOptions['render'] = {
                     visible: world.mouseVisible || false
                 };
-                var mouseConstraint = matter_js__WEBPACK_IMPORTED_MODULE_0__["MouseConstraint"].create(this.engine, {
+                var mouseConstraint = MouseConstraint.create(this.engine, {
                     mouse: mouse,
-                    constraint: matter_js__WEBPACK_IMPORTED_MODULE_0__["Constraint"].create(constraintOptions)
+                    constraint: Constraint.create(constraintOptions)
                 });
                 World.add(this.engine.world, mouseConstraint);
+                this.render['mouse'] = mouse;
                 //this.render.mouse = mouse;
                 // an example of using mouse events on a mouse
                 /*
                 Events.on(mouseConstraint, 'mousedown', function(event) {
-                    var mousePosition = event.mouse.position;
-                    console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
-                    //shakeScene(engine);
+                  var mousePosition = event.mouse.position;
+                  console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
+                  //shakeScene(engine);
                 });
-         
+               
                 // an example of using mouse events on a mouse
                 Events.on(mouseConstraint, 'mouseup', function(event) {
-                    var mousePosition = event.mouse.position;
-                    console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
+                  var mousePosition = event.mouse.position;
+                  console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
                 });
-         
+               
                 // an example of using mouse events on a mouse
                 Events.on(mouseConstraint, 'startdrag', function(event) {
-                    console.log('startdrag', event);
+                  console.log('startdrag', event);
                 });
-         
+               
                 // an example of using mouse events on a mouse
                 Events.on(mouseConstraint, 'enddrag', function(event) {
-                    console.log('enddrag', event);
+                  console.log('enddrag', event);
                 });
                 */
             }
@@ -21285,6 +21315,20 @@ var shapeFuncMap = {
     "rectangle": function (ctx, options) {
         return function (x, y, index) {
             return Bodies.rectangle(x, y, options['width'] || 100, options['height'] || 100, options);
+        };
+    },
+    "polygon": function (ctx, options) {
+        return function (x, y, index) {
+            var radius = options['radius'] || 25;
+            if (options['width']) {
+                radius = options['width'] / 2;
+            }
+            return matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"].polygon(x, y, options['sides'] || 5, radius, options);
+        };
+    },
+    "trapezoid": function (ctx, options) {
+        return function (x, y, index) {
+            return matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"].trapezoid(x, y, options['width'] || 100, options['height'] || 100, options['slope'] || 0.5, options);
         };
     },
     "unknown": function (ctx, options) {
