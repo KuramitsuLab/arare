@@ -14,8 +14,8 @@ export let ArareCode: Code = {
   world : {
     'width': 1000,
     'height': 1000,
-    'xGravity': 1,
-    'yGravity': 1,
+    'xGravity': 0.01,
+    'yGravity': 0.01,
     'mouse': true,
     'ticker': { 'x': 10, 'y': 10 },
   },
@@ -34,7 +34,11 @@ export let ArareCode: Code = {
         'y': 500,
       },
       'angle': 0.2 * Math.PI,
-      'fillStyle': 'rgba(11,11,11,0.1)',
+      'render': {
+        'fillStyle': 'rgba(11,11,11,0.1)',
+        'strokeStyle': 'blue',
+        'lineWidth': 10
+      },
       'velocity': { x: 1, y: 1 },
       'value': "ほげ",
       'isSensor': true,
@@ -42,7 +46,7 @@ export let ArareCode: Code = {
     {
       'shape': "rectangle",
       'concept': ['X', '壁', '長方形'],
-      'isStatic': true,
+      'isStatic': false,
       'chamfer': true,
       'name': 'X',
       'slop': 0.001,
@@ -54,7 +58,7 @@ export let ArareCode: Code = {
     {
       'shape': "polygon",
       'concept': ['多角形'],
-      'isStatic': true,
+      'isStatic': false,
       'chamfer': true,
       'sides': 6,
       'name': '多角形',
@@ -66,7 +70,7 @@ export let ArareCode: Code = {
     {
       'shape': "trapezoid",
       'concept': ['台形'],
-      'isStatic': true,
+      'isStatic': false,
       'chamfer': true,
       'name': 'X',
       'slop': 0.45,
