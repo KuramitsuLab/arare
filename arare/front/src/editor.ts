@@ -19,7 +19,7 @@ editor.on('change', (cm, obj) => {
     timer = null;
   }
   timer = setTimeout(() => {
-    // arare.compile(editor.getValue());
+    arare.compile(editor.getValue());
     arare.load(ArareCode);
     $('#play')[0].setAttribute('stroke', 'gray');
     $('#pause')[0].setAttribute('stroke', 'black');

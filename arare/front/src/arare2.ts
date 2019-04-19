@@ -1,5 +1,5 @@
 import * as Matter from 'matter-js';
-
+import * as $ from 'jquery';
 const Bodies = Matter.Bodies;
 const Engine = Matter.Engine;
 const Runner = Matter.Runner;
@@ -24,7 +24,6 @@ export type Code = {
 export class Arare2 {
   protected width: number;
   protected height: number;
-
   protected runner: Matter.Runner;
   protected engine: Matter.Engine;
   protected render: Matter.Render;
@@ -33,6 +32,8 @@ export class Arare2 {
   protected debug: boolean;
 
   public vars: {};
+
+  private DefaultRenderOptions: Matter.IRenderDefinition;
 
   public constructor(width: number, height: number) {
     this.width = width;
@@ -57,6 +58,7 @@ export class Arare2 {
         // debugString: "hoge\nこまったなあ",
       },
     };
+    this.DefaultRenderOptions = renderOptions;
     this.render = Render.create(renderOptions);
     this.canvas = this.render.canvas;
   }
@@ -95,25 +97,18 @@ export class Arare2 {
   }
 
   public dispose() {
-    if (this.runner) {
-      Runner.stop(this.runner);
-      this.runner = null;
-    }
-    if (this.engine) {
-      // Matter.World.clear(this.engine.world);
-      Engine.clear(this.engine);
-      this.engine = null;
-    }
-    if (this.render) {
-      Render.stop(this.render);
-      // render.canvas.remove();
-      // render.canvas = null;
-      // render.context = null;
-      // render.textures = {};
-    }
+    Engine.clear(this.engine);
+    this.engine = Engine.create();
+    Runner.stop(this.runner);
+    this.runner = Runner.create({});
+    Render.stop(this.render);
+    console.log(this.DefaultRenderOptions);
+    this.render = Render.create(this.DefaultRenderOptions);
+    this.canvas = this.render.canvas;
   }
 
   public load(code: Code) {
+    this.dispose();
     if (code.world) {
       const world = code.world;
       Render['lookAt'](this.render, {
@@ -237,7 +232,7 @@ export class Arare2 {
         },
         timeout: 5000,
       }).done((data) => {
-        this.load(data);
+        data;
       }).fail((XMLHttpRequest, textStatus, errorThrown) => {
         console.log(`XMLHttpRequest : ${XMLHttpRequest}`);
         console.log(errorThrown);

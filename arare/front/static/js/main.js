@@ -21078,6 +21078,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Arare2", function() { return Arare2; });
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! matter-js */ "./node_modules/matter-js/build/matter.js");
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(matter_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_1__);
+
 
 var Bodies = matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"];
 var Engine = matter_js__WEBPACK_IMPORTED_MODULE_0__["Engine"];
@@ -21116,6 +21119,7 @@ var Arare2 = /** @class */ (function () {
                 wireframes: false,
             },
         };
+        this.DefaultRenderOptions = renderOptions;
         this.render = Render.create(renderOptions);
         this.canvas = this.render.canvas;
     }
@@ -21139,24 +21143,17 @@ var Arare2 = /** @class */ (function () {
         this.runner.enabled = false;
     };
     Arare2.prototype.dispose = function () {
-        if (this.runner) {
-            Runner.stop(this.runner);
-            this.runner = null;
-        }
-        if (this.engine) {
-            // Matter.World.clear(this.engine.world);
-            Engine.clear(this.engine);
-            this.engine = null;
-        }
-        if (this.render) {
-            Render.stop(this.render);
-            // render.canvas.remove();
-            // render.canvas = null;
-            // render.context = null;
-            // render.textures = {};
-        }
+        Engine.clear(this.engine);
+        this.engine = Engine.create();
+        Runner.stop(this.runner);
+        this.runner = Runner.create({});
+        Render.stop(this.render);
+        console.log(this.DefaultRenderOptions);
+        this.render = Render.create(this.DefaultRenderOptions);
+        this.canvas = this.render.canvas;
     };
     Arare2.prototype.load = function (code) {
+        this.dispose();
         if (code.world) {
             var world = code.world;
             Render['lookAt'](this.render, {
@@ -21273,9 +21270,8 @@ var Arare2 = /** @class */ (function () {
         }
     };
     Arare2.prototype.compile = function (inputs) {
-        var _this = this;
         try {
-            $.ajax({
+            jquery__WEBPACK_IMPORTED_MODULE_1__["ajax"]({
                 url: '/compile',
                 type: 'POST',
                 data: {
@@ -21283,7 +21279,7 @@ var Arare2 = /** @class */ (function () {
                 },
                 timeout: 5000,
             }).done(function (data) {
-                _this.load(data);
+                data;
             }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
                 console.log("XMLHttpRequest : " + XMLHttpRequest);
                 console.log(errorThrown);
@@ -21389,7 +21385,7 @@ editor.on('change', function (cm, obj) {
         timer = null;
     }
     timer = setTimeout(function () {
-        // arare.compile(editor.getValue());
+        arare.compile(editor.getValue());
         arare.load(_arare2_code__WEBPACK_IMPORTED_MODULE_2__["ArareCode"]);
         jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
         jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
