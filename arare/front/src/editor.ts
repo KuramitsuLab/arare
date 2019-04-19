@@ -20,7 +20,7 @@ editor.on('change', (cm, obj) => {
   }
   timer = setTimeout(() => {
     arare.compile(editor.getValue());
-    arare.load(ArareCode);
+    arare.load(window['ArareCode']);
     $('#play')[0].setAttribute('stroke', 'gray');
     $('#pause')[0].setAttribute('stroke', 'black');
   },　                400);
@@ -86,7 +86,7 @@ $('#pause').on('click', () => {
 });
 
 $('#reload').on('click', () => {
-  arare.load(ArareCode);
+  arare.load(window['ArareCode']);
   $('#play')[0].setAttribute('stroke', 'gray');
   $('#pause')[0].setAttribute('stroke', 'black');
 });

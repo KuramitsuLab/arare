@@ -97,13 +97,35 @@ export class Arare2 {
   }
 
   public dispose() {
+    // create an engine
+    World.clear(this.engine.world, false);
     Engine.clear(this.engine);
-    this.engine = Engine.create();
+    /* engineのアクティブ、非アクティブの制御を行う */
     Runner.stop(this.runner);
-    this.runner = Runner.create({});
     Render.stop(this.render);
-    console.log(this.DefaultRenderOptions);
-    this.render = Render.create(this.DefaultRenderOptions);
+    // this.render.canvas.remove();
+    this.render.canvas = null;
+    this.render.context = null;
+    this.render.textures = {};
+
+    const renderOptions = {
+      /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
+      element: document.getElementById('canvas'),
+      engine: this.engine,
+      options: {
+        /* オブジェクトが枠線のみになる */
+        width: this.width,
+        height: this.height,
+        background: 'rgba(0, 0, 0, 0)',
+        wireframes: false,
+        // showDebug: world.debug || false,
+        // showPositions: world.debug || false,
+        // showMousePositions: world.debug || false,
+        // debugString: "hoge\nこまったなあ",
+      },
+    };
+    this.DefaultRenderOptions = renderOptions;
+    this.render = Render.create(renderOptions);
     this.canvas = this.render.canvas;
   }
 

@@ -2,7 +2,7 @@
 var width = 1000;
 var height = 1000;
 
-export var ArareCode = {
+window.ArareCode = {
   world : {
     'width': 1000,
     'height': 1000,
