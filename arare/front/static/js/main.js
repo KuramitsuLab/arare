@@ -21147,7 +21147,7 @@ var Arare2 = /** @class */ (function () {
         /* engineのアクティブ、非アクティブの制御を行う */
         Runner.stop(this.runner);
         Render.stop(this.render);
-        // this.render.canvas.remove();
+        this.render.canvas.remove();
         this.render.canvas = null;
         this.render.context = null;
         this.render.textures = {};
