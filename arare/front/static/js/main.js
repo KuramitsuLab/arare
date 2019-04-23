@@ -20960,110 +20960,6 @@ module.exports = function(module) {
 
 /***/ }),
 
-/***/ "./src/arare2-code.js":
-/*!****************************!*\
-  !*** ./src/arare2-code.js ***!
-  \****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-
-var width = 1000;
-var height = 1000;
-
-window.ArareCode = {
-  world : {
-    'width': 1000,
-    'height': 1000,
-    'xGravity': 0.01,
-    'yGravity': 0.01,
-    'mouse': true,
-    'ticker': { 'x': 10, 'y': 10 },
-  },
-  bodies : [
-    {
-      'value': 0,
-    },
-    {
-      'shape': "circle",
-      'concept': ['ボール', '円'],
-      'name': 'ボール',
-      'width': 50,
-      'height': 50,
-      'position': {
-        'x': 500,
-        'y': 500,
-      },
-      'angle': 0.2 * Math.PI,
-      'render': {
-        'fillStyle': 'rgba(11,11,11,0.1)',
-        'strokeStyle': 'blue',
-        'lineWidth': 10
-      },
-      'velocity': { x: 1, y: 1 },
-      'value': "ほげ",
-      'isSensor': true,
-    },
-    {
-      'shape': "rectangle",
-      'concept': ['X', '壁', '長方形'],
-      'isStatic': false,
-      'chamfer': true,
-      'name': 'X',
-      'width': 180,
-      'height': 100,
-      'slop': 0.001,
-      'position': {
-        'x': 200,
-        'y': 300,
-      },
-    },
-    {
-      'shape': "polygon",
-      'concept': ['多角形','正方形'],
-      'isStatic': false,
-      'chamfer': true,
-      'sides': 6,
-      'name': '多角形',
-      'width': 100,
-      'height': 100,
-      'position': {
-        'x': 400,
-        'y': 500,
-      },
-
-    },
-    {
-      'shape': "trapezoid",
-      'concept': ['台形'],
-      'isStatic': false,
-      'chamfer': true,
-      'name': 'X',
-      'slop': 0.45,
-      'width': 100,
-      'height': 150,
-      'position': {
-        'x': 100,
-        'y': 700,
-      },
-    },
-    {
-      'value': 2,
-      'name': 'Y',
-    },
-    {
-      'name': 'SCORE',
-      'value': 1,
-      'position': { 'x': 100, 'y': 100 },
-    },
-  ],
-  errors : [
-  ]
-}
-
-
-/***/ }),
-
 /***/ "./src/arare2.ts":
 /*!***********************!*\
   !*** ./src/arare2.ts ***!
@@ -21285,6 +21181,7 @@ var Arare2 = /** @class */ (function () {
         }
     };
     Arare2.prototype.compile = function (inputs) {
+        var _this = this;
         try {
             jquery__WEBPACK_IMPORTED_MODULE_1__["ajax"]({
                 url: '/compile',
@@ -21300,6 +21197,7 @@ var Arare2 = /** @class */ (function () {
                 console.log(errorThrown);
                 console.log(textStatus);
             }).always(function (data) {
+                _this.load(window['ArareCode']);
                 console.log(data);
             });
         }
@@ -21361,6 +21259,98 @@ var shapeFunc = function (code, options) {
     }
     return shapeFuncMap['unknown'];
 };
+var _getTexture = function (render, imagePath) {
+    var image = render.textures[imagePath];
+    if (image) {
+        return image;
+    }
+    image = render.textures[imagePath] = new Image();
+    image.src = imagePath;
+    return image;
+};
+Render['bodies'] = function (render, bodies, context) {
+    var c = context, engine = render.engine, options = render.options, showInternalEdges = options.showInternalEdges || !options.wireframes, body, part, i, k;
+    for (i = 0; i < bodies.length; i++) {
+        body = bodies[i];
+        if (!body.render.visible) {
+            continue;
+        }
+        // handle compound parts
+        for (k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k++) {
+            part = body.parts[k];
+            if (!part.render.visible) {
+                continue;
+            }
+            if (options.showSleeping && body.isSleeping) {
+                c.globalAlpha = 0.5 * part.render.opacity;
+            }
+            else if (part.render.opacity !== 1) {
+                c.globalAlpha = part.render.opacity;
+            }
+            if (part.render.sprite && part.render.sprite.texture && !options.wireframes) {
+                // part sprite
+                var sprite = part.render.sprite, texture = _getTexture(render, sprite.texture);
+                c.translate(part.position.x, part.position.y);
+                c.rotate(part.angle);
+                c.drawImage(texture, texture.width * -sprite.xOffset * sprite.xScale, texture.height * -sprite.yOffset * sprite.yScale, texture.width * sprite.xScale, texture.height * sprite.yScale);
+                // revert translation, hopefully faster than save / restore
+                c.rotate(-part.angle);
+                c.translate(-part.position.x, -part.position.y);
+            }
+            else {
+                // part polygon
+                if (part.circleRadius) {
+                    c.beginPath();
+                    c.arc(part.position.x, part.position.y, part.circleRadius, 0, 2 * Math.PI);
+                }
+                else {
+                    c.beginPath();
+                    c.moveTo(part.vertices[0].x, part.vertices[0].y);
+                    for (var j = 1; j < part.vertices.length; j++) {
+                        if (!part.vertices[j - 1].isInternal || showInternalEdges) {
+                            c.lineTo(part.vertices[j].x, part.vertices[j].y);
+                        }
+                        else {
+                            c.moveTo(part.vertices[j].x, part.vertices[j].y);
+                        }
+                        if (part.vertices[j].isInternal && !showInternalEdges) {
+                            c.moveTo(part.vertices[(j + 1) % part.vertices.length].x, part.vertices[(j + 1) % part.vertices.length].y);
+                        }
+                    }
+                    c.lineTo(part.vertices[0].x, part.vertices[0].y);
+                    c.closePath();
+                }
+                if (!options.wireframes) {
+                    c.fillStyle = part.render.fillStyle;
+                    if (part.render.lineWidth) {
+                        c.lineWidth = part.render.lineWidth;
+                        c.strokeStyle = part.render.strokeStyle;
+                        c.stroke();
+                    }
+                    c.fill();
+                }
+                else {
+                    c.lineWidth = 1;
+                    c.strokeStyle = '#bbb';
+                    c.stroke();
+                }
+            }
+            c.globalAlpha = 1;
+            if (part.render.text) {
+                c.font = part.render.font || '32px Arial';
+                c.fillStyle = part.render.textStyle || 'white';
+                c.textAlign = 'center';
+                c.fillText('' + part.render.text, part.position.x, part.position.y + 10);
+            }
+            if (part.value) {
+                c.font = part.render.font || '32px Arial';
+                c.fillStyle = part.render.textStyle || 'white';
+                c.textAlign = 'center';
+                c.fillText('' + part.value, part.position.x, part.position.y + 10);
+            }
+        }
+    }
+};
 
 
 /***/ }),
@@ -21377,21 +21367,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _arare2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./arare2 */ "./src/arare2.ts");
-/* harmony import */ var _arare2_code__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./arare2-code */ "./src/arare2-code.js");
-/* harmony import */ var _arare2_code__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_arare2_code__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/ace.js */ "./node_modules/ace-builds/src-min-noconflict/ace.js");
-/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js */ "./node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js");
-/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__);
-
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/ace.js */ "./node_modules/ace-builds/src-min-noconflict/ace.js");
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js */ "./node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js");
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_3__);
 
 
 
 
 /* editor */
 var arare = new _arare2__WEBPACK_IMPORTED_MODULE_1__["Arare2"](500, 500);
-var editor = _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__["edit"]('editor');
-editor.setTheme(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__);
+var editor = _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_2__["edit"]('editor');
+editor.setTheme(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_3__);
 editor.getSession().setUseWrapMode(true); /* 折り返しあり */
 // editor.setFontSize(24);
 var timer = null;
@@ -21402,7 +21389,6 @@ editor.on('change', function (cm, obj) {
     }
     timer = setTimeout(function () {
         arare.compile(editor.getValue());
-        arare.load(window['ArareCode']);
         jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
         jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
     }, 400);
@@ -21543,7 +21529,7 @@ jquery__WEBPACK_IMPORTED_MODULE_0__(document).on('keydown', function (evt) {
 jquery__WEBPACK_IMPORTED_MODULE_0__('#extend').on('click', function () {
     requestFullscreen(arare.getCanvas());
 });
-arare.load(_arare2_code__WEBPACK_IMPORTED_MODULE_2__["ArareCode"]);
+arare.compile(editor.getValue());
 
 
 /***/ })

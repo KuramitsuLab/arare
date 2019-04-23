@@ -20,7 +20,6 @@ editor.on('change', (cm, obj) => {
   }
   timer = setTimeout(() => {
     arare.compile(editor.getValue());
-    arare.load(window['ArareCode']);
     $('#play')[0].setAttribute('stroke', 'gray');
     $('#pause')[0].setAttribute('stroke', 'black');
   },　                400);
@@ -167,4 +166,4 @@ $('#extend').on('click', () => {
   requestFullscreen(arare.getCanvas());
 });
 
-arare.load(ArareCode);
+arare.compile(editor.getValue());
