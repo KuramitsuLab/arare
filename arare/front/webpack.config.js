@@ -11,6 +11,11 @@ module.exports = {
     path: path.join(__dirname, "static/js/"),
     filename: "[name].js",
   },
+  externals: [
+    {
+      ArareCode: true,
+    }
+  ],
 
   module: {
     rules: [

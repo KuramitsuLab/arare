@@ -41,11 +41,11 @@ def js_dist(d):
 @app.route('/compile', methods=['POST'])
 def transcompile():
   inputText = request.form['source']
-  if '(ArareCode)' in inputText:
-    code = inputText
-  else:
-    code = compile(inputText)
-  return Response(code, mimetype='application/javascript')
+  # if '(ArareCode)' in inputText:
+  #   code = inputText
+  # else:
+  #   code = compile(inputText)
+  return Response(inputText, mimetype='application/javascript')
 
 def main():
 	app.run(host='0.0.0.0', port=8080, debug=True)

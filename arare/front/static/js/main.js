@@ -20964,17 +20964,14 @@ module.exports = function(module) {
 /*!****************************!*\
   !*** ./src/arare2-code.js ***!
   \****************************/
-/*! exports provided: ArareCode */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ArareCode", function() { return ArareCode; });
 
 var width = 1000;
 var height = 1000;
 
-var ArareCode = {
+window.ArareCode = {
   world : {
     'width': 1000,
     'height': 1000,
@@ -21064,6 +21061,7 @@ var ArareCode = {
   ]
 }
 
+
 /***/ }),
 
 /***/ "./src/arare2.ts":
@@ -21078,6 +21076,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Arare2", function() { return Arare2; });
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! matter-js */ "./node_modules/matter-js/build/matter.js");
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(matter_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_1__);
+
 
 var Bodies = matter_js__WEBPACK_IMPORTED_MODULE_0__["Bodies"];
 var Engine = matter_js__WEBPACK_IMPORTED_MODULE_0__["Engine"];
@@ -21116,6 +21117,7 @@ var Arare2 = /** @class */ (function () {
                 wireframes: false,
             },
         };
+        this.DefaultRenderOptions = renderOptions;
         this.render = Render.create(renderOptions);
         this.canvas = this.render.canvas;
     }
@@ -21139,24 +21141,34 @@ var Arare2 = /** @class */ (function () {
         this.runner.enabled = false;
     };
     Arare2.prototype.dispose = function () {
-        if (this.runner) {
-            Runner.stop(this.runner);
-            this.runner = null;
-        }
-        if (this.engine) {
-            // Matter.World.clear(this.engine.world);
-            Engine.clear(this.engine);
-            this.engine = null;
-        }
-        if (this.render) {
-            Render.stop(this.render);
-            // render.canvas.remove();
-            // render.canvas = null;
-            // render.context = null;
-            // render.textures = {};
-        }
+        // create an engine
+        World.clear(this.engine.world, false);
+        Engine.clear(this.engine);
+        /* engineのアクティブ、非アクティブの制御を行う */
+        Runner.stop(this.runner);
+        Render.stop(this.render);
+        this.render.canvas.remove();
+        this.render.canvas = null;
+        this.render.context = null;
+        this.render.textures = {};
+        var renderOptions = {
+            /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
+            element: document.getElementById('canvas'),
+            engine: this.engine,
+            options: {
+                /* オブジェクトが枠線のみになる */
+                width: this.width,
+                height: this.height,
+                background: 'rgba(0, 0, 0, 0)',
+                wireframes: false,
+            },
+        };
+        this.DefaultRenderOptions = renderOptions;
+        this.render = Render.create(renderOptions);
+        this.canvas = this.render.canvas;
     };
     Arare2.prototype.load = function (code) {
+        this.dispose();
         if (code.world) {
             var world = code.world;
             Render['lookAt'](this.render, {
@@ -21273,9 +21285,8 @@ var Arare2 = /** @class */ (function () {
         }
     };
     Arare2.prototype.compile = function (inputs) {
-        var _this = this;
         try {
-            $.ajax({
+            jquery__WEBPACK_IMPORTED_MODULE_1__["ajax"]({
                 url: '/compile',
                 type: 'POST',
                 data: {
@@ -21283,7 +21294,7 @@ var Arare2 = /** @class */ (function () {
                 },
                 timeout: 5000,
             }).done(function (data) {
-                _this.load(data);
+                data;
             }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
                 console.log("XMLHttpRequest : " + XMLHttpRequest);
                 console.log(errorThrown);
@@ -21367,6 +21378,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _arare2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./arare2 */ "./src/arare2.ts");
 /* harmony import */ var _arare2_code__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./arare2-code */ "./src/arare2-code.js");
+/* harmony import */ var _arare2_code__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_arare2_code__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/ace.js */ "./node_modules/ace-builds/src-min-noconflict/ace.js");
 /* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js */ "./node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js");
@@ -21389,8 +21401,8 @@ editor.on('change', function (cm, obj) {
         timer = null;
     }
     timer = setTimeout(function () {
-        // arare.compile(editor.getValue());
-        arare.load(_arare2_code__WEBPACK_IMPORTED_MODULE_2__["ArareCode"]);
+        arare.compile(editor.getValue());
+        arare.load(window['ArareCode']);
         jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
         jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
     }, 400);
@@ -21449,7 +21461,7 @@ jquery__WEBPACK_IMPORTED_MODULE_0__('#pause').on('click', function () {
     jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'gray');
 });
 jquery__WEBPACK_IMPORTED_MODULE_0__('#reload').on('click', function () {
-    arare.load(_arare2_code__WEBPACK_IMPORTED_MODULE_2__["ArareCode"]);
+    arare.load(window['ArareCode']);
     jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
     jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
 });
