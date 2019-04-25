@@ -21269,14 +21269,21 @@ var _getTexture = function (render, imagePath) {
     return image;
 };
 Render['bodies'] = function (render, bodies, context) {
-    var c = context, engine = render.engine, options = render.options, showInternalEdges = options.showInternalEdges || !options.wireframes, body, part, i, k;
-    for (i = 0; i < bodies.length; i++) {
+    var c = context;
+    var engine = render.engine;
+    var options = render.options;
+    var showInternalEdges = options.showInternalEdges || !options.wireframes;
+    var body;
+    var part;
+    var i;
+    var k;
+    for (i = 0; i < bodies.length; i += 1) {
         body = bodies[i];
         if (!body.render.visible) {
             continue;
         }
         // handle compound parts
-        for (k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k++) {
+        for (k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k += 1) {
             part = body.parts[k];
             if (!part.render.visible) {
                 continue;
@@ -21289,7 +21296,8 @@ Render['bodies'] = function (render, bodies, context) {
             }
             if (part.render.sprite && part.render.sprite.texture && !options.wireframes) {
                 // part sprite
-                var sprite = part.render.sprite, texture = _getTexture(render, sprite.texture);
+                var sprite = part.render.sprite;
+                var texture = _getTexture(render, sprite.texture);
                 c.translate(part.position.x, part.position.y);
                 c.rotate(part.angle);
                 c.drawImage(texture, texture.width * -sprite.xOffset * sprite.xScale, texture.height * -sprite.yOffset * sprite.yScale, texture.width * sprite.xScale, texture.height * sprite.yScale);
@@ -21306,7 +21314,7 @@ Render['bodies'] = function (render, bodies, context) {
                 else {
                     c.beginPath();
                     c.moveTo(part.vertices[0].x, part.vertices[0].y);
-                    for (var j = 1; j < part.vertices.length; j++) {
+                    for (var j = 1; j < part.vertices.length; j += 1) {
                         if (!part.vertices[j - 1].isInternal || showInternalEdges) {
                             c.lineTo(part.vertices[j].x, part.vertices[j].y);
                         }
@@ -21340,13 +21348,13 @@ Render['bodies'] = function (render, bodies, context) {
                 c.font = part.render.font || '32px Arial';
                 c.fillStyle = part.render.textStyle || 'white';
                 c.textAlign = 'center';
-                c.fillText('' + part.render.text, part.position.x, part.position.y + 10);
+                c.fillText("" + (part.render.text, part.position.x, part.position.y + 10));
             }
             if (part.value) {
                 c.font = part.render.font || '32px Arial';
                 c.fillStyle = part.render.textStyle || 'white';
                 c.textAlign = 'center';
-                c.fillText('' + part.value, part.position.x, part.position.y + 10);
+                c.fillText("" + (part.value, part.position.x, part.position.y + 10));
             }
         }
     }
