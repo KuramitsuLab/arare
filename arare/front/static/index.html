@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title> ARARE playground </title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,161 +8,81 @@
 </head>
 
 <body>
-  
-<div class="flex-list">
-  <div class="flex-item">
+
+  <div class="flex-list">
+    <div class="flex-item">
       <div id="canvas"></div>
       <img src="image/arare.png" alt="ArareLogo" width="300" height="80" style="float:left">
-  </div>
-
-  <div class="flex-item">
-    <div id="editor">var width = 1000;
-    var height = 1000;
-    
-    window.ArareCode = {
-    world : {
-    'width': 1000,
-    'height': 1000,
-    'xGravity': 0.01,
-    'yGravity': 0.01,
-    'mouse': true,
-    'ticker': { 'x': 10, 'y': 10 },
-    },
-    bodies : [
-    {
-    'value': 0,
-    },
-    {
-    'shape': "circle",
-    'concept': ['ボール', '円'],
-    'name': 'ボール',
-    'width': 50,
-    'height': 50,
-    'position': {
-    'x': 500,
-    'y': 500,
-    },
-    'angle': 0.2 * Math.PI,
-    'render': {
-    'fillStyle': 'rgba(11,11,11,0.1)',
-    'strokeStyle': 'blue',
-    'lineWidth': 10
-    },
-    'velocity': { x: 1, y: 1 },
-    'value': "ほげ",
-    'isSensor': true,
-    },
-    {
-    'shape': "rectangle",
-    'concept': ['X', '壁', '長方形'],
-    'isStatic': false,
-    'chamfer': true,
-    'name': 'X',
-    'width': 180,
-    'height': 100,
-    'slop': 0.001,
-    'position': {
-    'x': 200,
-    'y': 300,
-    },
-    },
-    {
-    'shape': "polygon",
-    'concept': ['多角形','正方形'],
-    'isStatic': false,
-    'chamfer': true,
-    'sides': 6,
-    'name': '多角形',
-    'width': 100,
-    'height': 100,
-    'position': {
-    'x': 400,
-    'y': 500,
-    },
-    
-    },
-    {
-    'shape': "trapezoid",
-    'concept': ['台形'],
-    'isStatic': false,
-    'chamfer': true,
-    'name': 'X',
-    'slop': 0.45,
-    'width': 100,
-    'height': 150,
-    'position': {
-    'x': 100,
-    'y': 700,
-    },
-    },
-    {
-    'value': 2,
-    'name': 'Y',
-    },
-    {
-    'name': 'SCORE',
-    'value': 1,
-    'position': { 'x': 100, 'y': 100 },
-    },
-    ],
-    errors : [
-    ]
-    }
     </div>
-    <!-- https://cdn.rawgit.com/danklammer/bytesize-icons/master/examples/bytesize-inline.html -->
 
-  </div>
-
-  <div class="flex-sub">
-    <div class="flex-button">
-      <br>
-      <svg id="play" class="i-play" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-        <path d="M10 2 L10 30 24 16 Z" />
-      </svg>
-
-      <svg id="pause" class="i-pause" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-        <path d="M23 2 L23 30 M9 2 L9 30" />
-      </svg>
-
-      <svg id="reload" class="i-reload" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-        <path d="M29 16 C29 22 24 29 16 29 8 29 3 22 3 16 3 10 8 3 16 3 21 3 25 6 27 9 M20 10 L27 9 28 2" />
-      </svg>
-
-      <svg id="debug" class="i-options" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-        <path d="M28 6 L4 6 M28 16 L4 16 M28 26 L4 26 M24 3 L24 9 M8 13 L8 19 M20 23 L20 29" />
-      </svg>
-
-      <svg id="time" class="i-clock" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-        <circle cx="16" cy="16" r="14" />
-        <path d="M16 8 L16 16 20 20" />
-      </svg>
-
-      <svg id="msg" class="i-msg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-        <path d="M2 4 L30 4 30 22 16 22 8 29 8 22 2 22 Z" />
-      </svg>
-
-      <svg id="extend" class="i-external" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-        <path d="M14 9 L3 9 3 29 23 29 23 18 M18 4 L28 4 28 14 M28 4 L14 18" />
-      </svg>
-      <br>
-      <br>
-      <svg id="search" class="i-search" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-        <circle cx="14" cy="14" r="12" />
-        <path d="M23 23 L30 30"  />
-      </svg>
-
-      <svg id="font-plus" class="i-plus" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-      <path d="M16 2 L16 30 M2 16 L30 16" />
-      </svg>
-
-      <svg id="font-minus" class="i-minus" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-        <path d="M2 16 L30 16" />
-      </svg>
+    <div class="flex-item">
+      <div id="editor">
+      </div>
+      <!-- https://cdn.rawgit.com/danklammer/bytesize-icons/master/examples/bytesize-inline.html -->
 
     </div>
-  </div>
-</div>
 
-<script src="js/main.js"></script>
+    <div class="flex-sub">
+      <div class="flex-button">
+        <br>
+        <svg id="play" class="i-play" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor"
+          stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+          <path d="M10 2 L10 30 24 16 Z" />
+        </svg>
+
+        <svg id="pause" class="i-pause" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor"
+          stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+          <path d="M23 2 L23 30 M9 2 L9 30" />
+        </svg>
+
+        <svg id="reload" class="i-reload" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor"
+          stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+          <path d="M29 16 C29 22 24 29 16 29 8 29 3 22 3 16 3 10 8 3 16 3 21 3 25 6 27 9 M20 10 L27 9 28 2" />
+        </svg>
+
+        <svg id="debug" class="i-options" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor"
+          stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+          <path d="M28 6 L4 6 M28 16 L4 16 M28 26 L4 26 M24 3 L24 9 M8 13 L8 19 M20 23 L20 29" />
+        </svg>
+
+        <svg id="time" class="i-clock" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor"
+          stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+          <circle cx="16" cy="16" r="14" />
+          <path d="M16 8 L16 16 20 20" />
+        </svg>
+
+        <svg id="msg" class="i-msg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor"
+          stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+          <path d="M2 4 L30 4 30 22 16 22 8 29 8 22 2 22 Z" />
+        </svg>
+
+        <svg id="extend" class="i-external" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor"
+          stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+          <path d="M14 9 L3 9 3 29 23 29 23 18 M18 4 L28 4 28 14 M28 4 L14 18" />
+        </svg>
+        <br>
+        <br>
+        <svg id="search" class="i-search" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor"
+          stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+          <circle cx="14" cy="14" r="12" />
+          <path d="M23 23 L30 30" />
+        </svg>
+
+        <svg id="font-plus" class="i-plus" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor"
+          stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+          <path d="M16 2 L16 30 M2 16 L30 16" />
+        </svg>
+
+        <svg id="font-minus" class="i-minus" viewBox="0 0 32 32" width="32" height="32" fill="none"
+          stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+          <path d="M2 16 L30 16" />
+        </svg>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
 </body>
+
 </html>
