@@ -437,14 +437,14 @@ Render['bodies'] = function (render, bodies, context) {
         c.font = part.render.font || '32px Arial';
         c.fillStyle = part.render.textStyle || 'white';
         c.textAlign = 'center';
-        c.fillText(`${part.render.text, part.position.x, part.position.y + 10}`);
+        c.fillText(`${part.render.text}`, part.position.x, part.position.y + 10);
       }
 
       if (part.value) {
         c.font = part.render.font || '32px Arial';
         c.fillStyle = part.render.textStyle || 'white';
         c.textAlign = 'center';
-        c.fillText(`${part.value, part.position.x, part.position.y + 10}`);
+        c.fillText(`${part.value}`, part.position.x, part.position.y + 10);
       }
     }
   }
