@@ -22,7 +22,7 @@ editor.on('change', (cm, obj) => {
     arare.compile(editor.getValue());
     $('#play')[0].setAttribute('stroke', 'gray');
     $('#pause')[0].setAttribute('stroke', 'black');
-  }, 400);
+  },                 400);
 });
 
 let fullscreen = false;

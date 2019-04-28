@@ -339,16 +339,17 @@ const _getTexture = function (render, imagePath) {
 };
 
 Render['bodies'] = function (render, bodies, context) {
-  let c = context,
-    engine = render.engine,
-    options = render.options,
-    showInternalEdges = options.showInternalEdges || !options.wireframes,
-    body,
-    part,
-    i,
-    k;
+  const c = context;
+  const engine = render.engine;
+  const options = render.options;
+  const showInternalEdges = options.showInternalEdges || !options.wireframes;
 
-  for (i = 0; i < bodies.length; i++) {
+  let body;
+  let part;
+  let i;
+  let k;
+
+  for (i = 0; i < bodies.length; i += 1) {
     body = bodies[i];
 
     if (!body.render.visible) {
@@ -356,7 +357,7 @@ Render['bodies'] = function (render, bodies, context) {
     }
 
     // handle compound parts
-    for (k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k++) {
+    for (k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k += 1) {
       part = body.parts[k];
 
       if (!part.render.visible) {
@@ -371,8 +372,8 @@ Render['bodies'] = function (render, bodies, context) {
 
       if (part.render.sprite && part.render.sprite.texture && !options.wireframes) {
         // part sprite
-        const sprite = part.render.sprite,
-          texture = _getTexture(render, sprite.texture);
+        const sprite = part.render.sprite;
+        const texture = _getTexture(render, sprite.texture);
 
         c.translate(part.position.x, part.position.y);
         c.rotate(part.angle);
@@ -397,7 +398,7 @@ Render['bodies'] = function (render, bodies, context) {
           c.beginPath();
           c.moveTo(part.vertices[0].x, part.vertices[0].y);
 
-          for (let j = 1; j < part.vertices.length; j++) {
+          for (let j = 1; j < part.vertices.length; j += 1) {
             if (!part.vertices[j - 1].isInternal || showInternalEdges) {
               c.lineTo(part.vertices[j].x, part.vertices[j].y);
             } else {
@@ -436,14 +437,14 @@ Render['bodies'] = function (render, bodies, context) {
         c.font = part.render.font || '32px Arial';
         c.fillStyle = part.render.textStyle || 'white';
         c.textAlign = 'center';
-        c.fillText('' + part.render.text, part.position.x, part.position.y + 10);
+        c.fillText(`${part.render.text}`, part.position.x, part.position.y + 10);
       }
 
       if (part.value) {
         c.font = part.render.font || '32px Arial';
         c.fillStyle = part.render.textStyle || 'white';
         c.textAlign = 'center';
-        c.fillText('' + part.value, part.position.x, part.position.y + 10);
+        c.fillText(`${part.value}`, part.position.x, part.position.y + 10);
       }
     }
   }
