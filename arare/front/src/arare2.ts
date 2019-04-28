@@ -10,10 +10,10 @@ const Mouse = Matter.Mouse;
 const World = Matter.World;
 const Common = Matter['Common'];
 
-// import {Code} from './arare2-code';
 export type Code = {
   world: any,
   bodies: any[],
+  main: (Arare2) => void;
   errors?: {}[],
   rules?: any,
   shapeFuncMap?: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any },
@@ -43,7 +43,7 @@ export class Arare2 {
     /* engineのアクティブ、非アクティブの制御を行う */
     this.runner = Runner.create({});
     const renderOptions = {
-      /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
+      /* Matter.js の変な仕様 canvas に 描画領域が追加される */
       element: document.getElementById('canvas'),
       engine: this.engine,
       options: {
@@ -83,7 +83,7 @@ export class Arare2 {
   public ready() {
     Runner.run(this.runner, this.engine); / *物理エンジンを動かす * /;
     Render.run(this.render); /* 描画開始 */
-    this.runner.enabled = false;  / *初期位置を描画したら一度止める * /;
+    this.runner.enabled = false; / *初期位置を描画したら一度止める * /;
   }
 
   public start() {
@@ -129,88 +129,96 @@ export class Arare2 {
     this.canvas = this.render.canvas;
   }
 
+  private loadWorld(world: any) {
+    /* 描画サイズを自動拡大/縮小を設定する */
+    Render['lookAt'](this.render, {
+      min: { x: 0, y: 0 },
+      max: {
+        x: world.width || 1000,
+        y: world.height || 1000,
+      },
+    });
+    /* 重力を設定する */
+    const engine = this.engine;
+    if (world.gravity) {
+      engine.world.gravity = world.gravity;
+      // ジャイロスコープ
+      // デバイスの傾きで重力の向きを調整する
+      // https://github.com/liabru/matter-js/blob/master/examples/gyro.js
+      window.addEventListener('deviceorientation', (event) => {
+        const orientation = window.orientation || 0;
+        const gravity = engine.world.gravity;
+        if (orientation === 0) {
+          gravity.x = Common.clamp(event.gamma, -90, 90) / 90;
+          gravity.y = Common.clamp(event.beta, -90, 90) / 90;
+        } else if (orientation === 180) {
+          gravity.x = Common.clamp(event.gamma, -90, 90) / 90;
+          gravity.y = Common.clamp(-event.beta, -90, 90) / 90;
+        } else if (orientation === 90) {
+          gravity.x = Common.clamp(event.beta, -90, 90) / 90;
+          gravity.y = Common.clamp(-event.gamma, -90, 90) / 90;
+        } else if (orientation === -90) {
+          gravity.x = Common.clamp(-event.beta, -90, 90) / 90;
+          gravity.y = Common.clamp(event.gamma, -90, 90) / 90;
+        }
+      });
+    }
+    /* マウス */
+    if (world.mouse) {
+      const mouse = Mouse.create(this.render.canvas);
+      const constraintOptions = {
+        pointA: { x: 0, y: 0 },
+        pointB: { x: 0, y: 0 },
+        stiffness: world.mouseStiffness || 0.2,  /* 剛性 */
+      };
+      constraintOptions['render'] = {
+        visible: world.mouseVisible || false,
+      };
+      const mouseConstraint = MouseConstraint.create(this.engine, {
+        mouse,
+        constraint: Constraint.create(constraintOptions),
+      });
+      World.add(this.engine.world, mouseConstraint);
+      this.render['mouse'] = mouse;
+      // an example of using mouse events on a mouse
+      /*
+      Events.on(mouseConstraint, 'mousedown', function(event) {
+        var mousePosition = event.mouse.position;
+        console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
+        //shakeScene(engine);
+      });
+
+      // an example of using mouse events on a mouse
+      Events.on(mouseConstraint, 'mouseup', function(event) {
+        var mousePosition = event.mouse.position;
+        console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
+      });
+
+      // an example of using mouse events on a mouse
+      Events.on(mouseConstraint, 'startdrag', function(event) {
+        console.log('startdrag', event);
+      });
+
+      // an example of using mouse events on a mouse
+      Events.on(mouseConstraint, 'enddrag', function(event) {
+        console.log('enddrag', event);
+      });
+      */
+    }
+
+  }
+
   public load(code: Code) {
     this.dispose();
     if (code.world) {
-      const world = code.world;
-      Render['lookAt'](this.render, {
-        min: { x: 0, y: 0 },
-        max: {
-          x: world.width || 1000,
-          y: world.height || 1000,
-        },
-      });
-      /* マウス */
-      if (world.mouse || true) {
-        const mouse = Mouse.create(this.render.canvas);
-        const constraintOptions = {
-          pointA: { x: 0, y: 0 },
-          pointB: { x: 0, y: 0 },
-          stiffness: world.mouseStiffness || 0.2,  /* 剛性 */
-        };
-        constraintOptions['render'] = {
-          visible: world.mouseVisible || false,
-        };
-        const mouseConstraint = MouseConstraint.create(this.engine, {
-          mouse,
-          constraint: Constraint.create(constraintOptions),
-        });
-
-        World.add(this.engine.world, mouseConstraint);
-        this.render['mouse'] = mouse;
-        // this.render.mouse = mouse;
-
-        // an example of using mouse events on a mouse
-        /*
-        Events.on(mouseConstraint, 'mousedown', function(event) {
-          var mousePosition = event.mouse.position;
-          console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
-          //shakeScene(engine);
-        });
-
-        // an example of using mouse events on a mouse
-        Events.on(mouseConstraint, 'mouseup', function(event) {
-          var mousePosition = event.mouse.position;
-          console.log('mouseup at ' + mousePosition.x + ' ' + mousePosition.y);
-        });
-
-        // an example of using mouse events on a mouse
-        Events.on(mouseConstraint, 'startdrag', function(event) {
-          console.log('startdrag', event);
-        });
-
-        // an example of using mouse events on a mouse
-        Events.on(mouseConstraint, 'enddrag', function(event) {
-          console.log('enddrag', event);
-        });
-        */
-      }
-      const engine = this.engine;
-      engine.world.gravity.x = world.xGravity || 0;
-      engine.world.gravity.y = world.yGravity || 0;
-      if (world.yGravity) {
-        window.addEventListener('deviceorientation', (event) => {
-          const orientation = window.orientation || 0;
-          const gravity = engine.world.gravity;
-          if (orientation === 0) {
-            gravity.x = Common.clamp(event.gamma, -90, 90) / 90;
-            gravity.y = Common.clamp(event.beta, -90, 90) / 90;
-          } else if (orientation === 180) {
-            gravity.x = Common.clamp(event.gamma, -90, 90) / 90;
-            gravity.y = Common.clamp(-event.beta, -90, 90) / 90;
-          } else if (orientation === 90) {
-            gravity.x = Common.clamp(event.beta, -90, 90) / 90;
-            gravity.y = Common.clamp(-event.gamma, -90, 90) / 90;
-          } else if (orientation === -90) {
-            gravity.x = Common.clamp(-event.beta, -90, 90) / 90;
-            gravity.y = Common.clamp(event.gamma, -90, 90) / 90;
-          }
-        });
-      }
-    } /* world */
-    if (code.errors) {
-      // this.notify(this, code.errors);
+      // 世界の設定を行う
+      this.loadWorld(code.world);
     }
+    if (code.errors) {
+      // TODO
+      // editor にエラー情報をフィードバックする
+    }
+    // 物体の情報をアップデートする
     if (code.bodies) {
       const bodies = [];
       this.vars = {};
@@ -233,17 +241,10 @@ export class Arare2 {
         }*/
       }
       World.add(this.engine.world, bodies);
-      /*
-      if(vars.length > 0) {
-        this.render.options.variables = vars;
-      }
-      if (code.rules) {
-        code.rules(Matter, this);
-      }
-      */
-      this.ready();
     }
+    this.ready();
   }
+
   public compile(inputs: string) {
     try {
       $.ajax({
@@ -267,7 +268,6 @@ export class Arare2 {
       console.log(e); // FIXME
     }
   }
-
 }
 
 /* shapeFunc 物体の形状から物体を生成する関数 */
@@ -275,7 +275,7 @@ export class Arare2 {
 // (Arare2, {}) -> (number, number, number) -> any
 
 const shapeFuncMap: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => Matter.Body } = {
-  circle (ctx: Arare2, options: {}) {
+  circle(ctx: Arare2, options: {}) {
     return function (x, y, index) {
       let radius = options['radius'] || 25;
       if (options['width']) {
@@ -284,7 +284,7 @@ const shapeFuncMap: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y
       return Bodies.circle(x, y, radius, options);
     };
   },
-  rectangle (ctx: Arare2, options: {}) {
+  rectangle(ctx: Arare2, options: {}) {
     return function (x, y, index) {
       return Bodies.rectangle(x, y, options['width'] || 100, options['height'] || 100, options);
     };
@@ -303,7 +303,7 @@ const shapeFuncMap: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y
       return Matter.Bodies.trapezoid(x, y, options['width'] || 100, options['height'] || 100, options['slope'] || 0.5, options);
     };
   },
-  unknown (ctx: Arare2, options: {}) {
+  unknown(ctx: Arare2, options: {}) {
     return function (x, y, index) {
       let radius = options['radius'] || 25;
       if (options['width']) {
@@ -433,16 +433,9 @@ Render['bodies'] = function (render, bodies, context) {
 
       c.globalAlpha = 1;
 
-      if (part.render.text) {
-        c.font = part.render.font || '32px Arial';
-        c.fillStyle = part.render.textStyle || 'white';
-        c.textAlign = 'center';
-        c.fillText(`${part.render.text}`, part.position.x, part.position.y + 10);
-      }
-
       if (part.value) {
         c.font = part.render.font || '32px Arial';
-        c.fillStyle = part.render.textStyle || 'white';
+        c.fillStyle = part.render.fontStyle || 'white';
         c.textAlign = 'center';
         c.fillText(`${part.value}`, part.position.x, part.position.y + 10);
       }
