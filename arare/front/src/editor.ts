@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import { Arare2 } from './arare2';
-import { ArareCode } from './arare2-code';
+// import { ArareCode } from './arare2-code';
 import * as ace from '../node_modules/ace-builds/src-min-noconflict/ace.js';
 import * as solarized_light from '../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js';
 /* editor */
