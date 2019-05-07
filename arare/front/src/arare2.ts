@@ -166,7 +166,7 @@ export class Arare2 {
       });
     }
     /* マウス */
-    if (world.mwouse) {
+    if (world.mouse) {
       const mouse = Mouse.create(this.render.canvas);
       const constraintOptions = {
         pointA: { x: 0, y: 0 },
@@ -212,9 +212,6 @@ export class Arare2 {
 
   public load(code: Code) {
     this.dispose();
-    // const mainc = JSON.stringify(code, function (key, val) {
-    // ここに何か書けばいける？
-    // });
     if (code.world) {
       // 世界の設定を行う
       this.loadWorld(code.world);
