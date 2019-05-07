@@ -22,16 +22,17 @@ export type Code = {
 // (Arare2, {}) -> (number, number, number) -> any
 
 export class Arare2 {
-  protected width: number;
-  protected height: number;
-  protected runner: Matter.Runner;
-  protected engine: Matter.Engine;
-  protected render: Matter.Render;
-  protected canvas: HTMLCanvasElement;
+  public width: number;
+  public height: number;
+  public runner: Matter.Runner;
+  public engine: Matter.Engine;
+  public render: Matter.Render;
+  public canvas: HTMLCanvasElement;
 
-  protected debug: boolean;
+  public debug: boolean;
 
   public vars: {};
+  public main: (Arare2) => void;
 
   private DefaultRenderOptions: Matter.IRenderDefinition;
 
@@ -89,6 +90,7 @@ export class Arare2 {
   public start() {
     // console.log("start");
     this.runner.enabled = true;
+    this.main(this);
   }
 
   public pause() {
@@ -164,7 +166,7 @@ export class Arare2 {
       });
     }
     /* マウス */
-    if (world.mouse) {
+    if (world.mwouse) {
       const mouse = Mouse.create(this.render.canvas);
       const constraintOptions = {
         pointA: { x: 0, y: 0 },
@@ -210,6 +212,9 @@ export class Arare2 {
 
   public load(code: Code) {
     this.dispose();
+    // const mainc = JSON.stringify(code, function (key, val) {
+    // ここに何か書けばいける？
+    // });
     if (code.world) {
       // 世界の設定を行う
       this.loadWorld(code.world);
@@ -242,7 +247,9 @@ export class Arare2 {
       }
       World.add(this.engine.world, bodies);
     }
+    this.main = code.main || ((arare: Code) => {});
     this.ready();
+    // main関数を実行する
   }
 
   public compile(inputs: string) {
