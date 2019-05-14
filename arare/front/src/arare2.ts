@@ -82,11 +82,35 @@ export class Arare2 {
   public setDebug = (debug: boolean) => { this.debug = debug; };
 
   public ready() {
-    Runner.run(this.runner, this.engine); / *物理エンジンを動かす * /;
+    Runner.run(this.runner, this.engine); /*物理エンジンを動かす */
     Render.run(this.render); /* 描画開始 */
-    this.runner.enabled = false; / *初期位置を描画したら一度止める * /;
-  }
+    this.runner.enabled = false; /*初期位置を描画したら一度止める */
+    const engine = this.engine;
+    Matter.Events.on(this.engine, 'beforeUpdate', function (event) {
+      const bodies = Matter.Composite.allBodies(engine.world);
+      for (let i = 0; i < bodies.length; i += 1) {
+        const body:any = bodies[i];
+        for (let k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k += 1) {
+          const part = body.parts[k];
+          // rule.matchFunc = (part) => part.name == 'コメント';
+          // rule.actionFunc = (part) => {
+          //   const px = 100 * engine.timing.timestamp * 0.003;
+          //   Matter.Body.setPosition(body, { x: px, y: part.position.y });
+          // }
+          // for(rule of rules) {
+          //   if(rule.matchFunc(part)) {
+          //     rule.actionFunc(part);
+          //   }
+          // }
+          if (part.name == 'コメント') {
+            const px = 100 * engine.timing.timestamp * 0.003;
+            Matter.Body.setPosition(body, { x: px, y: part.position.y });
+          }
+        }
+      }
 
+    });
+  }
   public start() {
     // console.log("start");
     this.runner.enabled = true;
@@ -131,9 +155,23 @@ export class Arare2 {
     this.canvas = this.render.canvas;
   }
 
+  public print(text: string) {
+    const x = 0;
+    const y = Math.random() * this.height;
+    const body = Bodies.rectangle(
+      x, y, 20, 20,
+      { render: { fillStyle: 'rgba(33, 39, 98, 0)' },
+        isStatic: true,
+        isSensor: false,
+      });
+    body['name'] = 'コメント';
+    body['value'] = text;
+    World.add(this.engine.world, [body]);
+  }
+
   private loadWorld(world: any) {
-    /* 描画サイズを自動拡大/縮小を設定する */
-    Render['lookAt'](this.render, {
+  /* 描画サイズを自動拡大/縮小を設定する */
+    Render['lookAt'](this .render, {
       min: { x: 0, y: 0 },
       max: {
         x: world.width || 1000,
@@ -246,7 +284,6 @@ export class Arare2 {
     }
     this.main = code.main || ((arare: Code) => {});
     this.ready();
-    // main関数を実行する
   }
 
   public compile(inputs: string) {
@@ -439,7 +476,12 @@ Render['bodies'] = function (render, bodies, context) {
 
       if (part.value) {
         c.font = part.render.font || '32px Arial';
-        c.fillStyle = part.render.fontStyle || 'white';
+        if (part.name == 'コメント') {
+          c.fillStyle = 'black';
+        }
+        else {
+          c.fillStyle = part.render.fontStyle || 'red';
+        }
         c.textAlign = 'center';
         c.fillText(`${part.value}`, part.position.x, part.position.y + 10);
       }
