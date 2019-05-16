@@ -226,6 +226,8 @@ window.ArareCode = {
   main: function(arare){
     console.log("Hi!!!");
     arare.vars["ボール"].value = "のぶちゃん";
+    arare.print("Hello");
+    arare.print("Okey");
   },
   errors: [
   ]
