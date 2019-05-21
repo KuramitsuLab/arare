@@ -13,14 +13,19 @@ const Common = Matter['Common'];
 export type Code = {
   world: any,
   bodies: any[],
-  main: (Arare2) => void;
+  main: (Matter, Arare2) => void;
   errors?: {}[],
   rules?: any,
   shapeFuncMap?: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any },
 };
 
-// (Arare2, {}) -> (number, number, number) -> any
+export class ArareRule{
+  public matchFunc: (part: any) => boolean;
 
+  public actionFunc: (body: Matter.Body, engine: Matter.Engine) => void;
+}
+
+// (Arare2, {}) -> (number, number, number) -> any
 export class Arare2 {
   public width: number;
   public height: number;
@@ -32,7 +37,8 @@ export class Arare2 {
   public debug: boolean;
 
   public vars: {};
-  public main: (Arare2) => void;
+  public main: (Matter, Arare2) => void;
+  public rules: ArareRule[];
 
   private DefaultRenderOptions: Matter.IRenderDefinition;
 
@@ -62,6 +68,15 @@ export class Arare2 {
     this.DefaultRenderOptions = renderOptions;
     this.render = Render.create(renderOptions);
     this.canvas = this.render.canvas;
+
+    // const commentRule = {
+    //   matchFunc: (part) => part.name == 'コメント',
+    //   actionFunc: (body, engine) => {
+    //     const px = 100 * engine.timing.timestamp * 0.003;
+    //     Matter.Body.setPosition(body, { x: px, y: body.position.y });
+    //   },
+    // };
+    // this.rules = [commentRule];
   }
 
   public set_window_size(width: number, height: number) {
@@ -85,36 +100,30 @@ export class Arare2 {
     Runner.run(this.runner, this.engine); /*物理エンジンを動かす */
     Render.run(this.render); /* 描画開始 */
     this.runner.enabled = false; /*初期位置を描画したら一度止める */
-    const engine = this.engine;
+    const rules: ArareRule[] = this.rules;
+
+    console.log(rules);
+
+    const _this = this;
     Matter.Events.on(this.engine, 'beforeUpdate', function (event) {
-      const bodies = Matter.Composite.allBodies(engine.world);
-      for (let i = 0; i < bodies.length; i += 1) {
-        const body:any = bodies[i];
-        for (let k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k += 1) {
-          const part = body.parts[k];
-          // rule.matchFunc = (part) => part.name == 'コメント';
-          // rule.actionFunc = (part) => {
-          //   const px = 100 * engine.timing.timestamp * 0.003;
-          //   Matter.Body.setPosition(body, { x: px, y: part.position.y });
-          // }
-          // for(rule of rules) {
-          //   if(rule.matchFunc(part)) {
-          //     rule.actionFunc(part);
-          //   }
-          // }
-          if (part.name == 'コメント') {
-            const px = 100 * engine.timing.timestamp * 0.003;
-            Matter.Body.setPosition(body, { x: px, y: part.position.y });
+      const bodies = Matter.Composite.allBodies(_this.engine.world);
+      for (const rule of _this.rules) {
+        for (let i = 0; i < bodies.length; i += 1) {
+          const body: Matter.Body = bodies[i];
+          for (let k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k += 1) {
+            const part = body.parts[k];
+            if (rule.matchFunc(part)) {
+              rule.actionFunc(body, _this.engine);
+            }
           }
         }
       }
-
     });
   }
   public start() {
     // console.log("start");
     this.runner.enabled = true;
-    this.main(this);
+    this.main(Matter, this);
   }
 
   public pause() {
@@ -162,7 +171,7 @@ export class Arare2 {
       x, y, 20, 20,
       { render: { fillStyle: 'rgba(33, 39, 98, 0)' },
         isStatic: true,
-        isSensor: false,
+        isSensor: true,
       });
     body['name'] = 'コメント';
     body['value'] = text;
@@ -282,7 +291,7 @@ export class Arare2 {
       }
       World.add(this.engine.world, bodies);
     }
-    this.main = code.main || ((arare: Code) => {});
+    this.main = code.main || ((Matter:any, arare: Code) => {});
     this.ready();
   }
 
