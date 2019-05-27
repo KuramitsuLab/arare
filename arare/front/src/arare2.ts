@@ -104,16 +104,15 @@ export class Arare2 {
 
     console.log(rules);
 
-    const _this = this;
-    Matter.Events.on(this.engine, 'beforeUpdate', function (event) {
-      const bodies = Matter.Composite.allBodies(_this.engine.world);
-      for (const rule of _this.rules) {
+    Matter.Events.on(this.engine, 'beforeUpdate', (event: Matter.IEventTimestamped<Matter.Engine>) => {
+      const bodies = Matter.Composite.allBodies(this.engine.world);
+      for (const rule of this.rules) {
         for (let i = 0; i < bodies.length; i += 1) {
           const body: Matter.Body = bodies[i];
           for (let k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k += 1) {
             const part = body.parts[k];
             if (rule.matchFunc(part)) {
-              rule.actionFunc(body, _this.engine);
+              rule.actionFunc(body, this.engine);
             }
           }
         }
@@ -485,10 +484,9 @@ Render['bodies'] = function (render, bodies, context) {
 
       if (part.value) {
         c.font = part.render.font || '32px Arial';
-        if (part.name == 'コメント') {
+        if (part.name === 'コメント') {
           c.fillStyle = 'black';
-        }
-        else {
+        } else {
           c.fillStyle = part.render.fontStyle || 'red';
         }
         c.textAlign = 'center';
