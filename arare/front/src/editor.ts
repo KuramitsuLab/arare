@@ -58,14 +58,6 @@ function resizeMe() {
       arare.set_window_size(min, min);
     }
   }
-
-  arare.getCanvas().setAttribute('width', arare.getWidth().toString());
-  arare.getCanvas().setAttribute('height', arare.getHeight().toString());
-
-  const render = arare.getRender();
-  render.options.width = arare.getWidth();
-  render.options.height = arare.getHeight();
-
 }
 
 $(window).on('load', resizeMe);
@@ -90,31 +82,9 @@ $('#reload').on('click', () => {
   $('#pause')[0].setAttribute('stroke', 'black');
 });
 
-let background = 'rgba(0, 0, 0, 0)';
+const background = 'rgba(0, 0, 0, 0)';
 $('#debug').on('click', () => {
-  if (arare.getDebug()) {
-    const render = arare.getRender();
-    render.options.wireframes = false;
-    render.options['showPositions'] = false;
-    render.options['showMousePositions'] = false;
-    render.options['showVelocity'] = false;
-    render.options['showAngleIndicator'] = false;
-    render.options['showPositions'] = false;
-    render.options['showBounds'] = false;
-    render.options['background'] = background;
-    arare.setDebug(false);
-  } else {
-    const render = arare.getRender();
-    render.options.wireframes = true;
-    render.options['showPositions'] = true;
-    render.options['showMousePositions'] = true;
-    render.options['showVelocity'] = true;
-    render.options['showAngleIndicator'] = true;
-    render.options['showPositions'] = true;
-    background = render.options['background'];
-    render.options['background'] = 'rgba(0, 0, 0, 0)';
-    arare.setDebug(true);
-  }
+  arare.debug();
 });
 
 $('#font-plus').on('click', () => {

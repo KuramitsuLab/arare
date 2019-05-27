@@ -21,24 +21,23 @@ export type Code = {
 
 export class ArareRule{
   public matchFunc: (part: any) => boolean;
-
   public actionFunc: (body: Matter.Body, engine: Matter.Engine) => void;
 }
 
 // (Arare2, {}) -> (number, number, number) -> any
 export class Arare2 {
-  public width: number;
-  public height: number;
-  public runner: Matter.Runner;
-  public engine: Matter.Engine;
-  public render: Matter.Render;
-  public canvas: HTMLCanvasElement;
+  private width: number;
+  private height: number;
+  private runner: Matter.Runner;
+  private engine: Matter.Engine;
+  private render: Matter.Render;
+  private canvas: HTMLCanvasElement;
 
-  public debug: boolean;
+  private debug_mode: boolean;
 
-  public vars: {};
-  public main: (Matter, Arare2) => void;
-  public rules: ArareRule[];
+  private vars: {};
+  private main: (Matter, Arare2) => void;
+  private rules: ArareRule[];
 
   private DefaultRenderOptions: Matter.IRenderDefinition;
 
@@ -79,22 +78,16 @@ export class Arare2 {
     // this.rules = [commentRule];
   }
 
+  public getCanvas() { return this.canvas; }
+
   public set_window_size(width: number, height: number) {
     this.width = width;
     this.height = height;
+    this.canvas.setAttribute('width', this.width.toString());
+    this.canvas.setAttribute('width', this.height.toString());
+    this.render.options.width = this.width;
+    this.render.options.height = this.height;
   }
-
-  public getWidth = (): number => { return this.width; };
-
-  public getHeight = (): number => { return this.height; };
-
-  public getCanvas = (): HTMLCanvasElement => { return this.canvas; };
-
-  public getRender = (): Matter.Render => { return this.render; };
-
-  public getDebug = (): boolean => { return this.debug; };
-
-  public setDebug = (debug: boolean) => { this.debug = debug; };
 
   public ready() {
     Runner.run(this.runner, this.engine); /*物理エンジンを動かす */
@@ -119,6 +112,7 @@ export class Arare2 {
       }
     });
   }
+
   public start() {
     // console.log("start");
     this.runner.enabled = true;
@@ -161,6 +155,32 @@ export class Arare2 {
     this.DefaultRenderOptions = renderOptions;
     this.render = Render.create(renderOptions);
     this.canvas = this.render.canvas;
+  }
+
+  public debug() {
+    let background = 'rgba(0, 0, 0, 0)';
+    const render = this.render;
+    if (this.debug_mode) {
+      render.options.wireframes = false;
+      render.options['showPositions'] = false;
+      render.options['showMousePositions'] = false;
+      render.options['showVelocity'] = false;
+      render.options['showAngleIndicator'] = false;
+      render.options['showPositions'] = false;
+      render.options['showBounds'] = false;
+      render.options['background'] = background;
+      this.debug_mode = false;
+    } else {
+      render.options.wireframes = true;
+      render.options['showPositions'] = true;
+      render.options['showMousePositions'] = true;
+      render.options['showVelocity'] = true;
+      render.options['showAngleIndicator'] = true;
+      render.options['showPositions'] = true;
+      background = render.options['background'];
+      render.options['background'] = 'rgba(0, 0, 0, 0)';
+      this.debug_mode = true;
+    }
   }
 
   public print(text: string) {
