@@ -7,15 +7,12 @@ module.exports = {
   // メインとなるJavaScriptファイル（エントリーポイント）
   entry: './src/editor.ts',
 
+  target: 'node',
+
   output: {
     path: path.join(__dirname, "static/js/"),
     filename: "[name].js",
   },
-  externals: [
-    {
-      ArareCode: true,
-    }
-  ],
 
   module: {
     rules: [
