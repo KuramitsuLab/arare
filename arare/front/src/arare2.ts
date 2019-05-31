@@ -68,15 +68,6 @@ export class Arare2 {
     this.DefaultRenderOptions = renderOptions;
     this.render = Render.create(renderOptions);
     this.canvas = this.render.canvas;
-
-    // const commentRule = {
-    //   matchFunc: (part) => part.name == 'コメント',
-    //   actionFunc: (body, engine) => {
-    //     const px = 100 * engine.timing.timestamp * 0.003;
-    //     Matter.Body.setPosition(body, { x: px, y: body.position.y });
-    //   },
-    // };
-    // this.rules = [commentRule];
   }
 
   public set_window_size(width: number, height: number) {
@@ -165,7 +156,7 @@ export class Arare2 {
   }
 
   public print(text: string) {
-    const x = 0;
+    const x = this.width;
     const y = Math.random() * this.height;
     const body = Bodies.rectangle(
       x, y, 20, 20,
