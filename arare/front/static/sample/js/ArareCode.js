@@ -53,7 +53,7 @@ window['ArareCode'] = {
       },
     },
   ],
-  main: function (Matter, arare) {
+  main: function(Matter,arare){
     console.log("Hi!!!");
     arare.vars["ボール"].value = "のぶちゃん";
     arare.print("Hello");
@@ -61,7 +61,7 @@ window['ArareCode'] = {
     const commentRule = {
       matchFunc: (part) => part.name == 'コメント',
       actionFunc: (body, engine) => {
-        const px = 100 * engine.timing.timestamp * 0.003;
+        const px = 1000 - 100 * engine.timing.timestamp * 0.003;
         Matter.Body.setPosition(body, { x: px, y: body.position.y });
       },
     };

@@ -83,6 +83,7 @@ $('#reload').on('click', () => {
   $('#pause')[0].setAttribute('stroke', 'black');
 });
 
+const background = 'rgba(0, 0, 0, 0)';
 $('#debug').on('click', () => {
   arare.debug();
 });

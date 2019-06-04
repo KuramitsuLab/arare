@@ -69,15 +69,6 @@ export class Arare {
     };
     this.render = Render.create(this.DefaultRenderOptions());
     this.canvas = this.render.canvas;
-
-    // const commentRule = {
-    //   matchFunc: (part) => part.name == 'コメント',
-    //   actionFunc: (body, engine) => {
-    //     const px = 100 * engine.timing.timestamp * 0.003;
-    //     Matter.Body.setPosition(body, { x: px, y: body.position.y });
-    //   },
-    // };
-    // this.rules = [commentRule];
   }
 
   public getCanvas() { return this.canvas; }
@@ -168,7 +159,7 @@ export class Arare {
   }
 
   public print(text: string) {
-    const x = 0;
+    const x = this.width;
     const y = Math.random() * this.height;
     const body = Bodies.rectangle(
       x, y, 20, 20,
