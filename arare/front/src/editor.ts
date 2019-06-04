@@ -1,11 +1,12 @@
 import * as $ from 'jquery';
-import { Arare2 } from './arare2';
+import { Arare } from './arare';
+import { getSample } from './api';
 // import { ArareCode } from './arare2-code';
 import * as ace from '../node_modules/ace-builds/src-min-noconflict/ace.js';
 import * as solarized_light from '../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js';
 /* editor */
 
-const arare: Arare2 = new Arare2(500, 500);
+const arare: Arare = new Arare(500, 500);
 
 const editor = ace.edit('editor');
 editor.setTheme(solarized_light);
@@ -58,14 +59,6 @@ function resizeMe() {
       arare.set_window_size(min, min);
     }
   }
-
-  arare.getCanvas().setAttribute('width', arare.getWidth().toString());
-  arare.getCanvas().setAttribute('height', arare.getHeight().toString());
-
-  const render = arare.getRender();
-  render.options.width = arare.getWidth();
-  render.options.height = arare.getHeight();
-
 }
 
 $(window).on('load', resizeMe);
@@ -90,31 +83,9 @@ $('#reload').on('click', () => {
   $('#pause')[0].setAttribute('stroke', 'black');
 });
 
-let background = 'rgba(0, 0, 0, 0)';
+const background = 'rgba(0, 0, 0, 0)';
 $('#debug').on('click', () => {
-  if (arare.getDebug()) {
-    const render = arare.getRender();
-    render.options.wireframes = false;
-    render.options['showPositions'] = false;
-    render.options['showMousePositions'] = false;
-    render.options['showVelocity'] = false;
-    render.options['showAngleIndicator'] = false;
-    render.options['showPositions'] = false;
-    render.options['showBounds'] = false;
-    render.options['background'] = background;
-    arare.setDebug(false);
-  } else {
-    const render = arare.getRender();
-    render.options.wireframes = true;
-    render.options['showPositions'] = true;
-    render.options['showMousePositions'] = true;
-    render.options['showVelocity'] = true;
-    render.options['showAngleIndicator'] = true;
-    render.options['showPositions'] = true;
-    background = render.options['background'];
-    render.options['background'] = 'rgba(0, 0, 0, 0)';
-    arare.setDebug(true);
-  }
+  arare.debug();
 });
 
 $('#font-plus').on('click', () => {
@@ -166,80 +137,9 @@ $('#extend').on('click', () => {
   requestFullscreen(arare.getCanvas());
 });
 
-editor.setValue(`var width = 1000;
-var height = 1000;
-window.ArareCode = {
-  world: {
-    'width': 1000,
-    'height': 1000,
-    'xGravity': 0.0,
-    'yGravity': 0.05,
-    'mouse': true,
-    'ticker': { 'x': 10, 'y': 10 },
-  },
-  bodies: [
-    {
-      'shape': "circle",
-      'concept': ['ボール', '円'],
-      'name': 'ボール',
-      'width': 100, 'height': 50,
-      'position': { 'x': 500, 'y': 500 },
-      'angle': 0.2 * Math.PI,
-      'render': {
-        'fillStyle': 'rgba(11,11,11,0.1)',
-        'strokeStyle': 'blue',
-        'lineWidth': 10
-      },
-      'velocity': { x: 1, y: -300 },
-      'value': "さかね",
-      'isSensor': false,
-    },
-    {
-      'shape': "rectangle",
-      'concept': ['X', '壁', '長方形'],
-      'isStatic': true,
-      'chamfer': true,
-      'name': 'X',
-      'width': 600,
-      'height': 50,
-      'slop': 0.1,
-      'position': {
-        'x': 500,
-        'y': 800,
-      },
-    },
-    {
-      'shape': "polygon",
-      'concept': ['多角形', '正方形'],
-      'isStatic': false,
-      'chamfer': true,
-      'sides': 6,
-      'name': '多角形',
-      'width': 100,
-      'height': 100,
-      'position': {
-        'x': 400,
-        'y': 500,
-      },
-    },
-  ],
-  main: function(Matter,arare){
-    console.log("Hi!!!");
-    arare.vars["ボール"].value = "のぶちゃん";
-    arare.print("Hello");
-    arare.print("Comment");
-    const commentRule = {
-      matchFunc: (part) => part.name == 'コメント',
-      actionFunc: (body, engine) => {
-        const px = 1000 - 100 * engine.timing.timestamp * 0.003;
-        Matter.Body.setPosition(body, { x: px, y: body.position.y });
-      },
-    };
-    arare.rules = [commentRule];
-  },
-  errors: [
-  ]
-}
-`);
-
-arare.compile(editor.getValue());
+getSample('js/ArareCode.js').then((sample: string) => {
+  editor.setValue(sample);
+  arare.compile(editor.getValue());
+}).catch((msg: string) => {
+  console.error(msg);
+});

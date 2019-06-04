@@ -21036,14 +21036,6 @@ var Arare = /** @class */ (function () {
         };
         this.render = Render.create(this.DefaultRenderOptions());
         this.canvas = this.render.canvas;
-        // const commentRule = {
-        //   matchFunc: (part) => part.name == 'コメント',
-        //   actionFunc: (body, engine) => {
-        //     const px = 100 * engine.timing.timestamp * 0.003;
-        //     Matter.Body.setPosition(body, { x: px, y: body.position.y });
-        //   },
-        // };
-        // this.rules = [commentRule];
     }
     Arare.prototype.getCanvas = function () { return this.canvas; };
     Arare.prototype.set_window_size = function (width, height) {
@@ -21127,7 +21119,7 @@ var Arare = /** @class */ (function () {
         }
     };
     Arare.prototype.print = function (text) {
-        var x = 0;
+        var x = this.width;
         var y = Math.random() * this.height;
         var body = Bodies.rectangle(x, y, 20, 20, { render: { fillStyle: 'rgba(33, 39, 98, 0)' },
             isStatic: true,
@@ -21413,6 +21405,7 @@ jquery__WEBPACK_IMPORTED_MODULE_0__('#reload').on('click', function () {
     jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
     jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
 });
+var background = 'rgba(0, 0, 0, 0)';
 jquery__WEBPACK_IMPORTED_MODULE_0__('#debug').on('click', function () {
     arare.debug();
 });
