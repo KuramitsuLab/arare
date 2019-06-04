@@ -38,9 +38,14 @@ def js_dist(d):
   return send_static_file('js', d)
 
 
+@app.route('/sample/<path:d>')
+def sample_dist(d):
+  return send_static_file('sample', d)
+
+
 @app.route('/compile', methods=['POST'])
 def transcompile():
-  inputText = request.form['source']
+  inputText = request.data
   # if '(ArareCode)' in inputText:
   #   code = inputText
   # else:

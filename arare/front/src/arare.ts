@@ -1,9 +1,10 @@
 import * as Matter from 'matter-js';
-import * as $ from 'jquery';
+import * as api from './api';
+import { myRender } from './render';
 const Bodies = Matter.Bodies;
 const Engine = Matter.Engine;
 const Runner = Matter.Runner;
-const Render = Matter.Render;
+const Render = myRender(Matter.Render);
 const Constraint = Matter.Constraint;
 const MouseConstraint = Matter.MouseConstraint;
 const Mouse = Matter.Mouse;
@@ -16,31 +17,30 @@ export type Code = {
   main: (Matter, Arare2) => void;
   errors?: {}[],
   rules?: any,
-  shapeFuncMap?: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => any },
+  shapeFuncMap?: { [key: string]: (ctx: Arare, options: {}) => (x: number, y: number, index: number) => any },
 };
 
 export class ArareRule{
   public matchFunc: (part: any) => boolean;
-
   public actionFunc: (body: Matter.Body, engine: Matter.Engine) => void;
 }
 
-// (Arare2, {}) -> (number, number, number) -> any
-export class Arare2 {
-  public width: number;
-  public height: number;
-  public runner: Matter.Runner;
-  public engine: Matter.Engine;
-  public render: Matter.Render;
-  public canvas: HTMLCanvasElement;
+// (Arare, {}) -> (number, number, number) -> any
+export class Arare {
+  private width: number;
+  private height: number;
+  private runner: Matter.Runner;
+  private engine: Matter.Engine;
+  private render: Matter.Render;
+  private canvas: HTMLCanvasElement;
 
-  public debug: boolean;
+  private debug_mode: boolean;
 
-  public vars: {};
-  public main: (Matter, Arare2) => void;
-  public rules: ArareRule[];
+  private vars: {};
+  private main: (Matter, Arare2) => void;
+  private rules: ArareRule[];
 
-  private DefaultRenderOptions: Matter.IRenderDefinition;
+  private DefaultRenderOptions: () => Matter.IRenderDefinition;
 
   public constructor(width: number, height: number) {
     this.width = width;
@@ -49,43 +49,38 @@ export class Arare2 {
     this.engine = Engine.create();
     /* engineのアクティブ、非アクティブの制御を行う */
     this.runner = Runner.create({});
-    const renderOptions = {
-      /* Matter.js の変な仕様 canvas に 描画領域が追加される */
-      element: document.getElementById('canvas'),
-      engine: this.engine,
-      options: {
-        /* オブジェクトが枠線のみになる */
-        width: this.width,
-        height: this.height,
-        background: 'rgba(0, 0, 0, 0)',
-        wireframes: false,
-        // showDebug: world.debug || false,
-        // showPositions: world.debug || false,
-        // showMousePositions: world.debug || false,
-        // debugString: "hoge\nこまったなあ",
-      },
+    this.DefaultRenderOptions = () => {
+      return {
+        /* Matter.js の変な仕様 canvas に 描画領域が追加される */
+        element: document.getElementById('canvas'),
+        engine: this.engine,
+        options: {
+          /* オブジェクトが枠線のみになる */
+          width: this.width,
+          height: this.height,
+          background: 'rgba(0, 0, 0, 0)',
+          wireframes: false,
+          // showDebug: world.debug || false,
+          // showPositions: world.debug || false,
+          // showMousePositions: world.debug || false,
+          // debugString: "hoge\nこまったなあ",
+        },
+      };
     };
-    this.DefaultRenderOptions = renderOptions;
-    this.render = Render.create(renderOptions);
+    this.render = Render.create(this.DefaultRenderOptions());
     this.canvas = this.render.canvas;
   }
+
+  public getCanvas() { return this.canvas; }
 
   public set_window_size(width: number, height: number) {
     this.width = width;
     this.height = height;
+    this.canvas.setAttribute('width', this.width.toString());
+    this.canvas.setAttribute('width', this.height.toString());
+    this.render.options.width = this.width;
+    this.render.options.height = this.height;
   }
-
-  public getWidth = (): number => { return this.width; };
-
-  public getHeight = (): number => { return this.height; };
-
-  public getCanvas = (): HTMLCanvasElement => { return this.canvas; };
-
-  public getRender = (): Matter.Render => { return this.render; };
-
-  public getDebug = (): boolean => { return this.debug; };
-
-  public setDebug = (debug: boolean) => { this.debug = debug; };
 
   public ready() {
     Runner.run(this.runner, this.engine); /*物理エンジンを動かす */
@@ -95,22 +90,22 @@ export class Arare2 {
 
     console.log(rules);
 
-    const _this = this;
-    Matter.Events.on(this.engine, 'beforeUpdate', function (event) {
-      const bodies = Matter.Composite.allBodies(_this.engine.world);
-      for (const rule of _this.rules) {
+    Matter.Events.on(this.engine, 'beforeUpdate', (event: Matter.IEventTimestamped<Matter.Engine>) => {
+      const bodies = Matter.Composite.allBodies(this.engine.world);
+      for (const rule of this.rules) {
         for (let i = 0; i < bodies.length; i += 1) {
           const body: Matter.Body = bodies[i];
           for (let k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k += 1) {
             const part = body.parts[k];
             if (rule.matchFunc(part)) {
-              rule.actionFunc(body, _this.engine);
+              rule.actionFunc(body, this.engine);
             }
           }
         }
       }
     });
   }
+
   public start() {
     // console.log("start");
     this.runner.enabled = true;
@@ -133,26 +128,34 @@ export class Arare2 {
     this.render.canvas = null;
     this.render.context = null;
     this.render.textures = {};
-
-    const renderOptions = {
-      /* Matter.js の変な仕様 canvas に新しい canvas が追加される */
-      element: document.getElementById('canvas'),
-      engine: this.engine,
-      options: {
-        /* オブジェクトが枠線のみになる */
-        width: this.width,
-        height: this.height,
-        background: 'rgba(0, 0, 0, 0)',
-        wireframes: false,
-        // showDebug: world.debug || false,
-        // showPositions: world.debug || false,
-        // showMousePositions: world.debug || false,
-        // debugString: "hoge\nこまったなあ",
-      },
-    };
-    this.DefaultRenderOptions = renderOptions;
-    this.render = Render.create(renderOptions);
+    this.render = Render.create(this.DefaultRenderOptions());
     this.canvas = this.render.canvas;
+  }
+
+  public debug() {
+    let background = 'rgba(0, 0, 0, 0)';
+    const render = this.render;
+    if (this.debug_mode) {
+      render.options.wireframes = false;
+      render.options['showPositions'] = false;
+      render.options['showMousePositions'] = false;
+      render.options['showVelocity'] = false;
+      render.options['showAngleIndicator'] = false;
+      render.options['showPositions'] = false;
+      render.options['showBounds'] = false;
+      render.options['background'] = background;
+      this.debug_mode = false;
+    } else {
+      render.options.wireframes = true;
+      render.options['showPositions'] = true;
+      render.options['showMousePositions'] = true;
+      render.options['showVelocity'] = true;
+      render.options['showAngleIndicator'] = true;
+      render.options['showPositions'] = true;
+      background = render.options['background'];
+      render.options['background'] = 'rgba(0, 0, 0, 0)';
+      this.debug_mode = true;
+    }
   }
 
   public print(text: string) {
@@ -286,28 +289,10 @@ export class Arare2 {
     this.ready();
   }
 
-  public compile(inputs: string) {
-    try {
-      $.ajax({
-        url: '/compile',
-        type: 'POST',
-        data: {
-          source: inputs,
-        },
-        timeout: 5000,
-      }).done((data) => {
-        data;
-      }).fail((XMLHttpRequest, textStatus, errorThrown) => {
-        console.log(`XMLHttpRequest : ${XMLHttpRequest}`);
-        console.log(errorThrown);
-        console.log(textStatus);
-      }).always((data) => {
-        this.load(window['ArareCode']);
-        console.log(data);
-      });
-    } catch (e) {
-      console.log(e); // FIXME
-    }
+  public compile(code: string) {
+    api.compile(code).then(() => {
+      this.load(window['ArareCode']);
+    });
   }
 }
 
@@ -315,8 +300,8 @@ export class Arare2 {
 
 // (Arare2, {}) -> (number, number, number) -> any
 
-const shapeFuncMap: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y: number, index: number) => Matter.Body } = {
-  circle(ctx: Arare2, options: {}) {
+const shapeFuncMap: { [key: string]: (ctx: Arare, options: {}) => (x: number, y: number, index: number) => Matter.Body } = {
+  circle(ctx: Arare, options: {}) {
     return function (x, y, index) {
       let radius = options['radius'] || 25;
       if (options['width']) {
@@ -325,12 +310,12 @@ const shapeFuncMap: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y
       return Bodies.circle(x, y, radius, options);
     };
   },
-  rectangle(ctx: Arare2, options: {}) {
+  rectangle(ctx: Arare, options: {}) {
     return function (x, y, index) {
       return Bodies.rectangle(x, y, options['width'] || 100, options['height'] || 100, options);
     };
   },
-  polygon(ctx: Arare2, options: {}) {
+  polygon(ctx: Arare, options: {}) {
     return function (x, y, index) {
       let radius = options['radius'] || 25;
       if (options['width']) {
@@ -339,12 +324,12 @@ const shapeFuncMap: { [key: string]: (ctx: Arare2, options: {}) => (x: number, y
       return Matter.Bodies.polygon(x, y, options['sides'] || 5, radius, options);
     };
   },
-  trapezoid(ctx: Arare2, options: {}) {
+  trapezoid(ctx: Arare, options: {}) {
     return function (x, y, index) {
       return Matter.Bodies.trapezoid(x, y, options['width'] || 100, options['height'] || 100, options['slope'] || 0.5, options);
     };
   },
-  unknown(ctx: Arare2, options: {}) {
+  unknown(ctx: Arare, options: {}) {
     return function (x, y, index) {
       let radius = options['radius'] || 25;
       if (options['width']) {
@@ -364,127 +349,4 @@ const shapeFunc = (code: Code, options: {}) => {
     return shapeFuncMap[shape];
   }
   return shapeFuncMap['unknown'];
-};
-
-const _getTexture = function (render, imagePath) {
-  let image = render.textures[imagePath];
-
-  if (image) {
-    return image;
-  }
-
-  image = render.textures[imagePath] = new Image();
-  image.src = imagePath;
-
-  return image;
-};
-
-Render['bodies'] = function (render, bodies, context) {
-  const c = context;
-  const engine = render.engine;
-  const options = render.options;
-  const showInternalEdges = options.showInternalEdges || !options.wireframes;
-
-  let body;
-  let part;
-  let i;
-  let k;
-
-  for (i = 0; i < bodies.length; i += 1) {
-    body = bodies[i];
-
-    if (!body.render.visible) {
-      continue;
-    }
-
-    // handle compound parts
-    for (k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k += 1) {
-      part = body.parts[k];
-
-      if (!part.render.visible) {
-        continue;
-      }
-
-      if (options.showSleeping && body.isSleeping) {
-        c.globalAlpha = 0.5 * part.render.opacity;
-      } else if (part.render.opacity !== 1) {
-        c.globalAlpha = part.render.opacity;
-      }
-
-      if (part.render.sprite && part.render.sprite.texture && !options.wireframes) {
-        // part sprite
-        const sprite = part.render.sprite;
-        const texture = _getTexture(render, sprite.texture);
-
-        c.translate(part.position.x, part.position.y);
-        c.rotate(part.angle);
-
-        c.drawImage(
-          texture,
-          texture.width * -sprite.xOffset * sprite.xScale,
-          texture.height * -sprite.yOffset * sprite.yScale,
-          texture.width * sprite.xScale,
-          texture.height * sprite.yScale,
-        );
-
-        // revert translation, hopefully faster than save / restore
-        c.rotate(-part.angle);
-        c.translate(-part.position.x, -part.position.y);
-      } else {
-        // part polygon
-        if (part.circleRadius) {
-          c.beginPath();
-          c.arc(part.position.x, part.position.y, part.circleRadius, 0, 2 * Math.PI);
-        } else {
-          c.beginPath();
-          c.moveTo(part.vertices[0].x, part.vertices[0].y);
-
-          for (let j = 1; j < part.vertices.length; j += 1) {
-            if (!part.vertices[j - 1].isInternal || showInternalEdges) {
-              c.lineTo(part.vertices[j].x, part.vertices[j].y);
-            } else {
-              c.moveTo(part.vertices[j].x, part.vertices[j].y);
-            }
-
-            if (part.vertices[j].isInternal && !showInternalEdges) {
-              c.moveTo(part.vertices[(j + 1) % part.vertices.length].x, part.vertices[(j + 1) % part.vertices.length].y);
-            }
-          }
-
-          c.lineTo(part.vertices[0].x, part.vertices[0].y);
-          c.closePath();
-        }
-
-        if (!options.wireframes) {
-          c.fillStyle = part.render.fillStyle;
-
-          if (part.render.lineWidth) {
-            c.lineWidth = part.render.lineWidth;
-            c.strokeStyle = part.render.strokeStyle;
-            c.stroke();
-          }
-
-          c.fill();
-        } else {
-          c.lineWidth = 1;
-          c.strokeStyle = '#bbb';
-          c.stroke();
-        }
-      }
-
-      c.globalAlpha = 1;
-
-      if (part.value) {
-        c.font = part.render.font || '32px Arial';
-        if (part.name == 'コメント') {
-          c.fillStyle = 'black';
-        }
-        else {
-          c.fillStyle = part.render.fontStyle || 'red';
-        }
-        c.textAlign = 'center';
-        c.fillText(`${part.value}`, part.position.x, part.position.y + 10);
-      }
-    }
-  }
 };
