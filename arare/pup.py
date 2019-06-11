@@ -25,18 +25,26 @@ def Source(t):
 
 
 def VarDecl(t):
-    left = conv(t['left'])
+    left = f"puppy.vars['{conv(t['left'])}']"
     right = conv(t['right'])
     return '{} = {}'.format(left, right)
-
 
 def Name(t):
     return t.asString()
 
 
+cheepna = {
+    'print': 'puppy.print(',
+    'Ball': 'puppy.newMatter("circle", '
+}
+
+
 def ApplyExpr(t):
     name = conv(t['name'])
+    if name in cheepna:
+        return cheepna[name] + 'TODO)'
     return name + '(TODO)'
+
 
 def IfStmt(t):
     s = 'if ('
@@ -75,10 +83,10 @@ def transpile(s):
 
 # main スクリプト
 
-
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         with open(sys.argv[1]) as f:
             source = f.read()
     code = transpile(source)
     print(code)
+
