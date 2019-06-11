@@ -38,13 +38,25 @@ def ApplyExpr(t):
     name = conv(t['name'])
     return name + '(TODO)'
 
-# def IfStmt(t):
-#   s = 'if ('
-#   s += conv(s.cond)
-#   s += ') {'
-#   pass
-#   return s
+def IfStmt(t):
+    s = 'if ('
+    s += conv(t['cond'])
+    s += ')'
+    s += conv(t['then'])
+    return s
 
+
+def Infix(t):
+    s = conv(t['left']) + conv(t['name']) + conv(t['right'])
+    return s
+
+
+def Block(t):
+    s = '{'
+    for label, subtree in t:
+        s += conv(subtree) + '\n'
+    s += '}'
+    return s
 
 func = globals()
 
