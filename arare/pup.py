@@ -19,10 +19,24 @@ print("こんにちは、のぶちゃん")
 
 def Source(t):
     s = ''
-    for lb, st in t:
-        s += conv(st)
+    for label, subtree in t:
+        s += conv(subtree) + '\n'
     return s
 
+
+def VarDecl(t):
+    left = conv(t['left'])
+    right = conv(t['right'])
+    return '{} = {}'.format(left, right)
+
+
+def Name(t):
+    return t.asString()
+
+
+def ApplyExpr(t):
+    name = conv(t['name'])
+    return name + '(TODO)'
 
 # def IfStmt(t):
 #   s = 'if ('
