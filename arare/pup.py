@@ -51,6 +51,9 @@ def IfStmt(t):
     s += conv(t['cond'])
     s += ')'
     s += conv(t['then'])
+    if 'else' in t:
+        s += 'else'
+        s += conv(t['else'])
     return s
 
 
@@ -60,7 +63,7 @@ def Infix(t):
 
 
 def Block(t):
-    s = '{'
+    s = '{' + '\n'
     for label, subtree in t:
         s += conv(subtree) + '\n'
     s += '}'
