@@ -137,7 +137,7 @@ $('#extend').on('click', () => {
   requestFullscreen(arare.getCanvas());
 });
 
-getSample('js/ArareCode.js').then((sample: string) => {
+getSample('ppy/sample.ppy').then((sample: string) => {
   editor.setValue(sample);
   arare.compile(editor.getValue());
 }).catch((msg: string) => {
