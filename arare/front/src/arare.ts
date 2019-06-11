@@ -43,6 +43,7 @@ export class Arare {
   private DefaultRenderOptions: () => Matter.IRenderDefinition;
 
   public constructor(width: number, height: number) {
+    this.rules = [];
     this.width = width;
     this.height = height;
     // create an engine
