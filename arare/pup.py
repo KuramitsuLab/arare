@@ -1,3 +1,4 @@
+import sys
 from pegpy.tpeg import grammar, generate, STDLOG
 
 # 文法を直したいときは
@@ -6,23 +7,21 @@ from pegpy.tpeg import grammar, generate, STDLOG
 peg = grammar('puppy.tpeg')
 parser = generate(peg)
 
-t = parser('''
-if a > 0:
-  print("さかね")
-''')
+source = '''
+print("こんにちは、のぶちゃん")
+'''
 
-STDLOG.dump(t)
 
 # print(t.tag)
 # for label, subtree in t:
 #   print(label, subtree)
 
 
-# def Source(t):
-#   s = ''
-#   for lb, st in t:
-#     s += conv(st)
-#   return s
+def Source(t):
+    s = ''
+    for lb, st in t:
+        s += conv(st)
+    return s
 
 
 # def IfStmt(t):
@@ -33,9 +32,27 @@ STDLOG.dump(t)
 #   return s
 
 
-# func = globals()
+func = globals()
 
 
-# def conv(t):
-#   if t.tag in func:
-#     func[t.tag](t)
+def conv(t):
+    if t.tag in func:
+        return func[t.tag](t)
+    else:
+        return str(t)
+
+
+def transpile(s):
+    t = parser(s)
+    STDLOG.dump(t)  # debug
+    return conv(t)
+
+# main スクリプト
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        with open(sys.argv[1]) as f:
+            source = f.read()
+    code = transpile(source)
+    print(code)
