@@ -12,6 +12,23 @@ print("こんにちは、のぶちゃん")
 '''
 
 
+puppyVMCode = lambda main: f'''
+window['ArareCode'] = {{
+  world: {{
+    'width': 1000,
+    'height': 1000,
+    'xGravity': 0.0,
+    'yGravity': 0.05,
+    'mouse': true,
+  }},
+  bodies: [],
+  main: function(Matter,puppy){{
+    {main}
+  }},
+  errors: []
+}}
+'''
+
 # print(t.tag)
 # for label, subtree in t:
 #   print(label, subtree)
@@ -21,7 +38,7 @@ def Source(t):
     s = ''
     for label, subtree in t:
         s += conv(subtree) + '\n'
-    return s
+    return puppyVMCode(s)
 
 
 def VarDecl(t):
@@ -42,7 +59,7 @@ cheepna = {
 def ApplyExpr(t):
     name = conv(t['name'])
     if name in cheepna:
-        return cheepna[name] + 'TODO)'
+        return cheepna[name] + '{})'
     return name + '(TODO)'
 
 
@@ -93,3 +110,4 @@ if __name__ == "__main__":
     code = transpile(source)
     print(code)
 
+__package__ = 'puppy'

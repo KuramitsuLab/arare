@@ -7,6 +7,7 @@
 # from pegpy.origami.arare import compile
 
 from flask import Flask, render_template, send_file, request, Response
+from puppy import transpile
 
 app = Flask(__name__, template_folder='front/static')
 
@@ -50,7 +51,7 @@ def transcompile():
   #   code = inputText
   # else:
   #   code = compile(inputText)
-  return Response(inputText, mimetype='application/javascript')
+  return Response(transpile(inputText.decode('utf-8')), mimetype='application/javascript')
 
 def main():
 	app.run(host='0.0.0.0', port=8080, debug=True)
