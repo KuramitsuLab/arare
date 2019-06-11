@@ -158,6 +158,14 @@ export class Arare {
     }
   }
 
+  public newMatter(shape: string, options: {}) {
+    options['position'] = options['positions'] || { x: 500, y: 500 };
+    const shapeFunc = shape in shapeFuncMap ? shapeFuncMap[shape] : shapeFuncMap['unknown'];
+    const body = shapeFunc(this, options)(options['position']['x'], options['position']['y'], -1);
+    World.add(this.engine.world, [body]);
+    return body;
+  }
+
   public print(text: string) {
     const x = this.width;
     const y = Math.random() * this.height;

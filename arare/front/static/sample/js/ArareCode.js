@@ -53,11 +53,13 @@ window['ArareCode'] = {
       },
     },
   ],
-  main: function(Matter,arare){
+  main: function(Matter,puppy){
     console.log("Hi!!!");
-    arare.vars["ボール"].value = "のぶちゃん";
-    arare.print("Hello");
-    arare.print("Comment");
+    puppy.vars["A"] = puppy.newMatter('circle', {});
+    puppy.vars["A"] = puppy.newMatter('circle', {});
+    puppy.vars["ボール"].value = "のぶちゃん";
+    puppy.print("Hello");
+    puppy.print("Comment");
     const commentRule = {
       matchFunc: (part) => part.name == 'コメント',
       actionFunc: (body, engine) => {
@@ -65,7 +67,7 @@ window['ArareCode'] = {
         Matter.Body.setPosition(body, { x: px, y: body.position.y });
       },
     };
-    arare.rules = [commentRule];
+    puppy.rules = [commentRule];
   },
   errors: [
   ]
