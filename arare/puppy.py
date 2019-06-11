@@ -12,7 +12,7 @@ print("こんにちは、のぶちゃん")
 '''
 
 
-def arareCode(main): return f'''
+puppyVMCode = lambda main: f'''
 window['ArareCode'] = {{
   world: {{
     'width': 1000,
@@ -38,7 +38,7 @@ def Source(t):
     s = ''
     for label, subtree in t:
         s += conv(subtree) + '\n'
-    return arareCode(s)
+    return puppyVMCode(s)
 
 
 def VarDecl(t):
