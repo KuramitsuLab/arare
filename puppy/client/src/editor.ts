@@ -1,12 +1,11 @@
 import * as $ from 'jquery';
-import { Arare } from './arare';
+import { Puppy } from './puppy';
 import { getSample } from './api';
-// import { ArareCode } from './arare2-code';
 import * as ace from '../node_modules/ace-builds/src-min-noconflict/ace.js';
 import * as solarized_light from '../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js';
 /* editor */
 
-const arare: Arare = new Arare(500, 500);
+const puppy: Puppy = new Puppy(500, 500);
 
 const editor = ace.edit('editor');
 editor.setTheme(solarized_light);
@@ -20,7 +19,7 @@ editor.on('change', (cm, obj) => {
     timer = null;
   }
   timer = setTimeout(() => {
-    arare.compile(editor.getValue());
+    puppy.compile(editor.getValue());
     $('#play')[0].setAttribute('stroke', 'gray');
     $('#pause')[0].setAttribute('stroke', 'black');
   },                 400);
@@ -49,14 +48,14 @@ function resizeMe() {
   }
   if (fullscreen) {
     const min = Math.min(w, h);
-    arare.set_window_size(min, min);
+    puppy.set_window_size(min, min);
     fullscreen = false;
   } else {
     if (w <= 800) {
-      arare.set_window_size(w, w);
+      puppy.set_window_size(w, w);
     } else {
       const min = Math.min(w / 2, h);
-      arare.set_window_size(min, min);
+      puppy.set_window_size(min, min);
     }
   }
 }
@@ -65,27 +64,27 @@ $(window).on('load', resizeMe);
 $(window).on('resize', resizeMe);
 
 $('#play').on('click', () => {
-  arare.start();
+  puppy.start();
   $('#play')[0].setAttribute('stroke', 'gray');
   $('#pause')[0].setAttribute('stroke', 'black');
 });
 
 $('#pause')[0].setAttribute('stroke', 'gray');
 $('#pause').on('click', () => {
-  arare.pause();
+  puppy.pause();
   $('#play')[0].setAttribute('stroke', 'black');
   $('#pause')[0].setAttribute('stroke', 'gray');
 });
 
 $('#reload').on('click', () => {
-  arare.load(window['ArareCode']);
+  puppy.load(window['ArareCode']);
   $('#play')[0].setAttribute('stroke', 'gray');
   $('#pause')[0].setAttribute('stroke', 'black');
 });
 
 const background = 'rgba(0, 0, 0, 0)';
 $('#debug').on('click', () => {
-  arare.debug();
+  puppy.debug();
 });
 
 $('#font-plus').on('click', () => {
@@ -134,12 +133,12 @@ $(document).on('keydown', (evt) => {
 });
 
 $('#extend').on('click', () => {
-  requestFullscreen(arare.getCanvas());
+  requestFullscreen(puppy.getCanvas());
 });
 
 getSample('ppy/sample.ppy').then((sample: string) => {
   editor.setValue(sample);
-  arare.compile(editor.getValue());
+  puppy.compile(editor.getValue());
 }).catch((msg: string) => {
   console.error(msg);
 });

@@ -9,7 +9,7 @@
 from flask import Flask, render_template, send_file, request, Response
 from puppy import transpile
 
-app = Flask(__name__, template_folder='front/static')
+app = Flask(__name__, template_folder='client/static')
 
 @app.route('/')
 def index():
@@ -17,11 +17,11 @@ def index():
 
 @app.route('/<path:d>')
 def dist(d):
-	return send_file(f'front/static/{d}')
+	return send_file(f'client/static/{d}')
 
 
 def send_static_file(path1, path2):
-  return send_file(f'front/static/{path1}/{path2}')
+  return send_file(f'client/static/{path1}/{path2}')
 
 
 @app.route('/audio/<path:d>')

@@ -20953,9 +20953,9 @@ var compile = function (code) {
         throw new Error(res.statusText);
     }).then(function (js) {
         Function(js)(); // Eval javascript code
-        if (!window['ArareCode']) {
-            console.error(window['ArareCode']);
-            throw new Error("Don\'t exist ArareCode in window.");
+        if (!window['PuppyVMCode']) {
+            console.error(window['PuppyVMCode']);
+            throw new Error("Don\'t exist PuppyVMCode in window.");
         }
     }).catch(function (msg) {
         console.error(msg);
@@ -20977,17 +20977,175 @@ var getSample = function (path) {
 
 /***/ }),
 
-/***/ "./src/arare.ts":
-/*!**********************!*\
-  !*** ./src/arare.ts ***!
-  \**********************/
-/*! exports provided: ArareRule, Arare */
+/***/ "./src/editor.ts":
+/*!***********************!*\
+  !*** ./src/editor.ts ***!
+  \***********************/
+/*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ArareRule", function() { return ArareRule; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Arare", function() { return Arare; });
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _puppy__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./puppy */ "./src/puppy.ts");
+/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./api */ "./src/api.ts");
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/ace.js */ "./node_modules/ace-builds/src-min-noconflict/ace.js");
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js */ "./node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js");
+/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+
+/* editor */
+var puppy = new _puppy__WEBPACK_IMPORTED_MODULE_1__["Puppy"](500, 500);
+var editor = _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__["edit"]('editor');
+editor.setTheme(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__);
+editor.getSession().setUseWrapMode(true); /* 折り返しあり */
+// editor.setFontSize(24);
+var timer = null;
+editor.on('change', function (cm, obj) {
+    if (timer) {
+        clearTimeout(timer);
+        timer = null;
+    }
+    timer = setTimeout(function () {
+        puppy.compile(editor.getValue());
+        jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
+        jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
+    }, 400);
+});
+var fullscreen = false;
+function getFullscreen() {
+    if (document['webkitFullscreenElement']) {
+        return document['webkitFullscreenElement'];
+    }
+    if (document['mozFullScreenElement']) {
+        return document['mozFullScreenElement'];
+    }
+    if (document['msFullscreenElement']) {
+        return document['msFullscreenElement'];
+    }
+    return document['fullscreenElement'];
+}
+function resizeMe() {
+    var w = jquery__WEBPACK_IMPORTED_MODULE_0__(window).width();
+    var h = jquery__WEBPACK_IMPORTED_MODULE_0__(window).height();
+    console.log('resizeMe', w, h, fullscreen, getFullscreen());
+    if (getFullscreen() != null) {
+        fullscreen = true;
+    }
+    if (fullscreen) {
+        var min = Math.min(w, h);
+        puppy.set_window_size(min, min);
+        fullscreen = false;
+    }
+    else {
+        if (w <= 800) {
+            puppy.set_window_size(w, w);
+        }
+        else {
+            var min = Math.min(w / 2, h);
+            puppy.set_window_size(min, min);
+        }
+    }
+}
+jquery__WEBPACK_IMPORTED_MODULE_0__(window).on('load', resizeMe);
+jquery__WEBPACK_IMPORTED_MODULE_0__(window).on('resize', resizeMe);
+jquery__WEBPACK_IMPORTED_MODULE_0__('#play').on('click', function () {
+    puppy.start();
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
+});
+jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'gray');
+jquery__WEBPACK_IMPORTED_MODULE_0__('#pause').on('click', function () {
+    puppy.pause();
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'black');
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'gray');
+});
+jquery__WEBPACK_IMPORTED_MODULE_0__('#reload').on('click', function () {
+    puppy.load(window['ArareCode']);
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
+    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
+});
+var background = 'rgba(0, 0, 0, 0)';
+jquery__WEBPACK_IMPORTED_MODULE_0__('#debug').on('click', function () {
+    puppy.debug();
+});
+jquery__WEBPACK_IMPORTED_MODULE_0__('#font-plus').on('click', function () {
+    console.log(editor.getFontSize());
+    editor.setFontSize(editor.getFontSize() + 2);
+});
+jquery__WEBPACK_IMPORTED_MODULE_0__('#font-minus').on('click', function () {
+    editor.setFontSize(Math.max(8, editor.getFontSize() - 2));
+});
+function requestFullscreen(target) {
+    if (target.webkitRequestFullscreen) {
+        target.webkitRequestFullscreen(); // Chrome15+, Safari5.1+, Opera15+
+    }
+    else if (target.mozRequestFullScreen) {
+        target.mozRequestFullScreen(); // FF10+
+    }
+    else if (target.msRequestFullscreen) {
+        target.msRequestFullscreen(); // IE11+
+    }
+    else if (target.requestFullscreen) {
+        target.requestFullscreen(); // HTML5 Fullscreen API仕様
+    }
+    else {
+        // alert('ご利用のブラウザはフルスクリーン操作に対応していません');
+        return;
+    }
+}
+function exitFullscreen() {
+    if (document['webkitCancelFullScreen']) {
+        document['webkitCancelFullScreen'](); // Chrome15+, Safari5.1+, Opera15+
+    }
+    else if (document['mozCancelFullScreen']) {
+        document['mozCancelFullScreen'](); // FF10+
+    }
+    else if (document['msExitFullscreen']) {
+        document['msExitFullscreen'](); // IE11+
+    }
+    else if (document['cancelFullScreen']) {
+        document['cancelFullScreen'](); // Gecko:FullScreenAPI仕様
+    }
+    else if (document.exitFullscreen) {
+        document.exitFullscreen(); // HTML5 Fullscreen API仕様
+    }
+}
+jquery__WEBPACK_IMPORTED_MODULE_0__(document).on('keydown', function (evt) {
+    // KeyCode 27: ESC button
+    if (evt.keyCode === 27) {
+        exitFullscreen();
+    }
+});
+jquery__WEBPACK_IMPORTED_MODULE_0__('#extend').on('click', function () {
+    requestFullscreen(puppy.getCanvas());
+});
+Object(_api__WEBPACK_IMPORTED_MODULE_2__["getSample"])('ppy/sample.ppy').then(function (sample) {
+    editor.setValue(sample);
+    puppy.compile(editor.getValue());
+}).catch(function (msg) {
+    console.error(msg);
+});
+
+
+/***/ }),
+
+/***/ "./src/puppy.ts":
+/*!**********************!*\
+  !*** ./src/puppy.ts ***!
+  \**********************/
+/*! exports provided: PuppyRule, Puppy */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PuppyRule", function() { return PuppyRule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Puppy", function() { return Puppy; });
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! matter-js */ "./node_modules/matter-js/build/matter.js");
 /* harmony import */ var matter_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(matter_js__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./api */ "./src/api.ts");
@@ -21004,16 +21162,17 @@ var MouseConstraint = matter_js__WEBPACK_IMPORTED_MODULE_0__["MouseConstraint"];
 var Mouse = matter_js__WEBPACK_IMPORTED_MODULE_0__["Mouse"];
 var World = matter_js__WEBPACK_IMPORTED_MODULE_0__["World"];
 var Common = matter_js__WEBPACK_IMPORTED_MODULE_0__["Common"];
-var ArareRule = /** @class */ (function () {
-    function ArareRule() {
+var PuppyRule = /** @class */ (function () {
+    function PuppyRule() {
     }
-    return ArareRule;
+    return PuppyRule;
 }());
 
-// (Arare, {}) -> (number, number, number) -> any
-var Arare = /** @class */ (function () {
-    function Arare(width, height) {
+// (Puppy, {}) -> (number, number, number) -> any
+var Puppy = /** @class */ (function () {
+    function Puppy(width, height) {
         var _this = this;
+        this.rules = [];
         this.width = width;
         this.height = height;
         // create an engine
@@ -21037,8 +21196,8 @@ var Arare = /** @class */ (function () {
         this.render = Render.create(this.DefaultRenderOptions());
         this.canvas = this.render.canvas;
     }
-    Arare.prototype.getCanvas = function () { return this.canvas; };
-    Arare.prototype.set_window_size = function (width, height) {
+    Puppy.prototype.getCanvas = function () { return this.canvas; };
+    Puppy.prototype.set_window_size = function (width, height) {
         this.width = width;
         this.height = height;
         this.canvas.setAttribute('width', this.width.toString());
@@ -21046,7 +21205,7 @@ var Arare = /** @class */ (function () {
         this.render.options.width = this.width;
         this.render.options.height = this.height;
     };
-    Arare.prototype.ready = function () {
+    Puppy.prototype.ready = function () {
         var _this = this;
         Runner.run(this.runner, this.engine); /*物理エンジンを動かす */
         Render.run(this.render); /* 描画開始 */
@@ -21069,16 +21228,16 @@ var Arare = /** @class */ (function () {
             }
         });
     };
-    Arare.prototype.start = function () {
+    Puppy.prototype.start = function () {
         // console.log("start");
         this.runner.enabled = true;
         this.main(matter_js__WEBPACK_IMPORTED_MODULE_0__, this);
     };
-    Arare.prototype.pause = function () {
+    Puppy.prototype.pause = function () {
         // console.log("pause");
         this.runner.enabled = false;
     };
-    Arare.prototype.dispose = function () {
+    Puppy.prototype.dispose = function () {
         // create an engine
         World.clear(this.engine.world, false);
         Engine.clear(this.engine);
@@ -21092,7 +21251,7 @@ var Arare = /** @class */ (function () {
         this.render = Render.create(this.DefaultRenderOptions());
         this.canvas = this.render.canvas;
     };
-    Arare.prototype.debug = function () {
+    Puppy.prototype.debug = function () {
         var background = 'rgba(0, 0, 0, 0)';
         var render = this.render;
         if (this.debug_mode) {
@@ -21118,7 +21277,14 @@ var Arare = /** @class */ (function () {
             this.debug_mode = true;
         }
     };
-    Arare.prototype.print = function (text) {
+    Puppy.prototype.newMatter = function (shape, options) {
+        options['position'] = options['position'] || { x: 500, y: 500 };
+        var shapeFunc = shape in shapeFuncMap ? shapeFuncMap[shape] : shapeFuncMap['unknown'];
+        var body = shapeFunc(this, options)(options['position']['x'], options['position']['y'], -1);
+        World.add(this.engine.world, [body]);
+        return body;
+    };
+    Puppy.prototype.print = function (text) {
         var x = this.width;
         var y = Math.random() * this.height;
         var body = Bodies.rectangle(x, y, 20, 20, { render: { fillStyle: 'rgba(33, 39, 98, 0)' },
@@ -21129,7 +21295,7 @@ var Arare = /** @class */ (function () {
         body['value'] = text;
         World.add(this.engine.world, [body]);
     };
-    Arare.prototype.loadWorld = function (world) {
+    Puppy.prototype.loadWorld = function (world) {
         /* 描画サイズを自動拡大/縮小を設定する */
         Render['lookAt'](this.render, {
             min: { x: 0, y: 0 },
@@ -21209,7 +21375,7 @@ var Arare = /** @class */ (function () {
             */
         }
     };
-    Arare.prototype.load = function (code) {
+    Puppy.prototype.load = function (code) {
         this.dispose();
         if (code.world) {
             // 世界の設定を行う
@@ -21247,13 +21413,13 @@ var Arare = /** @class */ (function () {
         this.main = code.main || (function (Matter, arare) { });
         this.ready();
     };
-    Arare.prototype.compile = function (code) {
+    Puppy.prototype.compile = function (code) {
         var _this = this;
         _api__WEBPACK_IMPORTED_MODULE_1__["compile"](code).then(function () {
-            _this.load(window['ArareCode']);
+            _this.load(window['PuppyVMCode']);
         });
     };
-    return Arare;
+    return Puppy;
 }());
 
 /* shapeFunc 物体の形状から物体を生成する関数 */
@@ -21307,165 +21473,6 @@ var shapeFunc = function (code, options) {
     }
     return shapeFuncMap['unknown'];
 };
-
-
-/***/ }),
-
-/***/ "./src/editor.ts":
-/*!***********************!*\
-  !*** ./src/editor.ts ***!
-  \***********************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _arare__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./arare */ "./src/arare.ts");
-/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./api */ "./src/api.ts");
-/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/ace.js */ "./node_modules/ace-builds/src-min-noconflict/ace.js");
-/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js */ "./node_modules/ace-builds/src-min-noconflict/theme-solarized_light.js");
-/* harmony import */ var _node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__);
-
-
-
-// import { ArareCode } from './arare2-code';
-
-
-/* editor */
-var arare = new _arare__WEBPACK_IMPORTED_MODULE_1__["Arare"](500, 500);
-var editor = _node_modules_ace_builds_src_min_noconflict_ace_js__WEBPACK_IMPORTED_MODULE_3__["edit"]('editor');
-editor.setTheme(_node_modules_ace_builds_src_min_noconflict_theme_solarized_light_js__WEBPACK_IMPORTED_MODULE_4__);
-editor.getSession().setUseWrapMode(true); /* 折り返しあり */
-// editor.setFontSize(24);
-var timer = null;
-editor.on('change', function (cm, obj) {
-    if (timer) {
-        clearTimeout(timer);
-        timer = null;
-    }
-    timer = setTimeout(function () {
-        arare.compile(editor.getValue());
-        jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
-        jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
-    }, 400);
-});
-var fullscreen = false;
-function getFullscreen() {
-    if (document['webkitFullscreenElement']) {
-        return document['webkitFullscreenElement'];
-    }
-    if (document['mozFullScreenElement']) {
-        return document['mozFullScreenElement'];
-    }
-    if (document['msFullscreenElement']) {
-        return document['msFullscreenElement'];
-    }
-    return document['fullscreenElement'];
-}
-function resizeMe() {
-    var w = jquery__WEBPACK_IMPORTED_MODULE_0__(window).width();
-    var h = jquery__WEBPACK_IMPORTED_MODULE_0__(window).height();
-    console.log('resizeMe', w, h, fullscreen, getFullscreen());
-    if (getFullscreen() != null) {
-        fullscreen = true;
-    }
-    if (fullscreen) {
-        var min = Math.min(w, h);
-        arare.set_window_size(min, min);
-        fullscreen = false;
-    }
-    else {
-        if (w <= 800) {
-            arare.set_window_size(w, w);
-        }
-        else {
-            var min = Math.min(w / 2, h);
-            arare.set_window_size(min, min);
-        }
-    }
-}
-jquery__WEBPACK_IMPORTED_MODULE_0__(window).on('load', resizeMe);
-jquery__WEBPACK_IMPORTED_MODULE_0__(window).on('resize', resizeMe);
-jquery__WEBPACK_IMPORTED_MODULE_0__('#play').on('click', function () {
-    arare.start();
-    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
-    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
-});
-jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'gray');
-jquery__WEBPACK_IMPORTED_MODULE_0__('#pause').on('click', function () {
-    arare.pause();
-    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'black');
-    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'gray');
-});
-jquery__WEBPACK_IMPORTED_MODULE_0__('#reload').on('click', function () {
-    arare.load(window['ArareCode']);
-    jquery__WEBPACK_IMPORTED_MODULE_0__('#play')[0].setAttribute('stroke', 'gray');
-    jquery__WEBPACK_IMPORTED_MODULE_0__('#pause')[0].setAttribute('stroke', 'black');
-});
-var background = 'rgba(0, 0, 0, 0)';
-jquery__WEBPACK_IMPORTED_MODULE_0__('#debug').on('click', function () {
-    arare.debug();
-});
-jquery__WEBPACK_IMPORTED_MODULE_0__('#font-plus').on('click', function () {
-    console.log(editor.getFontSize());
-    editor.setFontSize(editor.getFontSize() + 2);
-});
-jquery__WEBPACK_IMPORTED_MODULE_0__('#font-minus').on('click', function () {
-    editor.setFontSize(Math.max(8, editor.getFontSize() - 2));
-});
-function requestFullscreen(target) {
-    if (target.webkitRequestFullscreen) {
-        target.webkitRequestFullscreen(); // Chrome15+, Safari5.1+, Opera15+
-    }
-    else if (target.mozRequestFullScreen) {
-        target.mozRequestFullScreen(); // FF10+
-    }
-    else if (target.msRequestFullscreen) {
-        target.msRequestFullscreen(); // IE11+
-    }
-    else if (target.requestFullscreen) {
-        target.requestFullscreen(); // HTML5 Fullscreen API仕様
-    }
-    else {
-        // alert('ご利用のブラウザはフルスクリーン操作に対応していません');
-        return;
-    }
-}
-function exitFullscreen() {
-    if (document['webkitCancelFullScreen']) {
-        document['webkitCancelFullScreen'](); // Chrome15+, Safari5.1+, Opera15+
-    }
-    else if (document['mozCancelFullScreen']) {
-        document['mozCancelFullScreen'](); // FF10+
-    }
-    else if (document['msExitFullscreen']) {
-        document['msExitFullscreen'](); // IE11+
-    }
-    else if (document['cancelFullScreen']) {
-        document['cancelFullScreen'](); // Gecko:FullScreenAPI仕様
-    }
-    else if (document.exitFullscreen) {
-        document.exitFullscreen(); // HTML5 Fullscreen API仕様
-    }
-}
-jquery__WEBPACK_IMPORTED_MODULE_0__(document).on('keydown', function (evt) {
-    // KeyCode 27: ESC button
-    if (evt.keyCode === 27) {
-        exitFullscreen();
-    }
-});
-jquery__WEBPACK_IMPORTED_MODULE_0__('#extend').on('click', function () {
-    requestFullscreen(arare.getCanvas());
-});
-Object(_api__WEBPACK_IMPORTED_MODULE_2__["getSample"])('js/ArareCode.js').then(function (sample) {
-    editor.setValue(sample);
-    arare.compile(editor.getValue());
-}).catch(function (msg) {
-    console.error(msg);
-});
 
 
 /***/ }),

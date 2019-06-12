@@ -13,7 +13,7 @@ print("こんにちは、のぶちゃん")
 
 
 puppyVMCode = lambda main: f'''
-window['ArareCode'] = {{
+window['PuppyVMCode'] = {{
   world: {{
     'width': 1000,
     'height': 1000,
