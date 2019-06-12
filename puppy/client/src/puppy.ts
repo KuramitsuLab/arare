@@ -17,16 +17,16 @@ export type Code = {
   main: (Matter, Arare2) => void;
   errors?: {}[],
   rules?: any,
-  shapeFuncMap?: { [key: string]: (ctx: Arare, options: {}) => (x: number, y: number, index: number) => any },
+  shapeFuncMap?: { [key: string]: (ctx: Puppy, options: {}) => (x: number, y: number, index: number) => any },
 };
 
-export class ArareRule{
+export class PuppyRule{
   public matchFunc: (part: any) => boolean;
   public actionFunc: (body: Matter.Body, engine: Matter.Engine) => void;
 }
 
-// (Arare, {}) -> (number, number, number) -> any
-export class Arare {
+// (Puppy, {}) -> (number, number, number) -> any
+export class Puppy {
   private width: number;
   private height: number;
   private runner: Matter.Runner;
@@ -38,7 +38,7 @@ export class Arare {
 
   private vars: {};
   private main: (Matter, Arare2) => void;
-  private rules: ArareRule[];
+  private rules: PuppyRule[];
 
   private DefaultRenderOptions: () => Matter.IRenderDefinition;
 
@@ -87,7 +87,7 @@ export class Arare {
     Runner.run(this.runner, this.engine); /*物理エンジンを動かす */
     Render.run(this.render); /* 描画開始 */
     this.runner.enabled = false; /*初期位置を描画したら一度止める */
-    const rules: ArareRule[] = this.rules;
+    const rules: PuppyRule[] = this.rules;
 
     console.log(rules);
 
@@ -300,7 +300,7 @@ export class Arare {
 
   public compile(code: string) {
     api.compile(code).then(() => {
-      this.load(window['ArareCode']);
+      this.load(window['PuppyVMCode']);
     });
   }
 }
@@ -309,8 +309,8 @@ export class Arare {
 
 // (Arare2, {}) -> (number, number, number) -> any
 
-const shapeFuncMap: { [key: string]: (ctx: Arare, options: {}) => (x: number, y: number, index: number) => Matter.Body } = {
-  circle(ctx: Arare, options: {}) {
+const shapeFuncMap: { [key: string]: (ctx: Puppy, options: {}) => (x: number, y: number, index: number) => Matter.Body } = {
+  circle(ctx: Puppy, options: {}) {
     return function (x, y, index) {
       let radius = options['radius'] || 25;
       if (options['width']) {
@@ -319,12 +319,12 @@ const shapeFuncMap: { [key: string]: (ctx: Arare, options: {}) => (x: number, y:
       return Bodies.circle(x, y, radius, options);
     };
   },
-  rectangle(ctx: Arare, options: {}) {
+  rectangle(ctx: Puppy, options: {}) {
     return function (x, y, index) {
       return Bodies.rectangle(x, y, options['width'] || 100, options['height'] || 100, options);
     };
   },
-  polygon(ctx: Arare, options: {}) {
+  polygon(ctx: Puppy, options: {}) {
     return function (x, y, index) {
       let radius = options['radius'] || 25;
       if (options['width']) {
@@ -333,12 +333,12 @@ const shapeFuncMap: { [key: string]: (ctx: Arare, options: {}) => (x: number, y:
       return Matter.Bodies.polygon(x, y, options['sides'] || 5, radius, options);
     };
   },
-  trapezoid(ctx: Arare, options: {}) {
+  trapezoid(ctx: Puppy, options: {}) {
     return function (x, y, index) {
       return Matter.Bodies.trapezoid(x, y, options['width'] || 100, options['height'] || 100, options['slope'] || 0.5, options);
     };
   },
-  unknown(ctx: Arare, options: {}) {
+  unknown(ctx: Puppy, options: {}) {
     return function (x, y, index) {
       let radius = options['radius'] || 25;
       if (options['width']) {

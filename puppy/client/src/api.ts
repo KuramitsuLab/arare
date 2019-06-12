@@ -13,9 +13,9 @@ export const compile: (code: string) => Promise<void> = (code) => {
     throw new Error(res.statusText);
   }).then((js: string) => {
     Function(js)(); // Eval javascript code
-    if (!window['ArareCode']) {
-      console.error(window['ArareCode']);
-      throw new Error("Don\'t exist ArareCode in window.");
+    if (!window['PuppyVMCode']) {
+      console.error(window['PuppyVMCode']);
+      throw new Error("Don\'t exist PuppyVMCode in window.");
     }
   },
   ).catch((msg: string) => {

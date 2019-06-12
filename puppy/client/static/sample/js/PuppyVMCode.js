@@ -1,4 +1,4 @@
-window['ArareCode'] = {
+window['PuppyVMCode'] = {
   world: {
     'width': 1000,
     'height': 1000,
