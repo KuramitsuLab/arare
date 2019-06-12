@@ -179,6 +179,14 @@ export class Puppy {
     body['name'] = 'コメント';
     body['value'] = text;
     World.add(this.engine.world, [body]);
+    const commentRule = {
+      matchFunc: part => part.name === 'コメント',
+      actionFunc: (body, engine) => {
+        const px = 1000 - 100 * engine.timing.timestamp * 0.003;
+        Matter.Body.setPosition(body, { x: px, y: body.position.y });
+      },
+    };
+    this.rules = [commentRule];
   }
 
   private loadWorld(world: any) {

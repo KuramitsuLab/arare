@@ -56,18 +56,9 @@ window['PuppyVMCode'] = {
   main: function(Matter,puppy){
     console.log("Hi!!!");
     puppy.vars["A"] = puppy.newMatter('circle', {});
-    puppy.vars["A"] = puppy.newMatter('circle', {});
     puppy.vars["ボール"].value = "のぶちゃん";
     puppy.print("Hello");
     puppy.print("Comment");
-    const commentRule = {
-      matchFunc: (part) => part.name == 'コメント',
-      actionFunc: (body, engine) => {
-        const px = 1000 - 100 * engine.timing.timestamp * 0.003;
-        Matter.Body.setPosition(body, { x: px, y: body.position.y });
-      },
-    };
-    puppy.rules = [commentRule];
   },
   errors: [
   ]
