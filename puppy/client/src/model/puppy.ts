@@ -42,10 +42,10 @@ export class Puppy {
 
   private DefaultRenderOptions: () => Matter.IRenderDefinition;
 
-  public constructor(width: number, height: number) {
+  public constructor() {
     this.rules = [];
-    this.width = width;
-    this.height = height;
+    this.width = 500;
+    this.height = 500;
     // create an engine
     this.engine = Engine.create();
     /* engineのアクティブ、非アクティブの制御を行う */
@@ -72,7 +72,20 @@ export class Puppy {
     this.canvas = this.render.canvas;
   }
 
-  public getCanvas() { return this.canvas; }
+  public requestFullScreen() {
+    if (this.canvas['webkitRequestFullscreen']) {
+      this.canvas['webkitRequestFullscreen'](); // Chrome15+, Safari5.1+, Opera15+
+    } else if (this.canvas['mozRequestFullScreen']) {
+      this.canvas['mozRequestFullScreen'](); // FF10+
+    } else if (this.canvas['msRequestFullscreen']) {
+      this.canvas['msRequestFullscreen'](); // IE11+
+    } else if (this.canvas['requestFullscreen']) {
+      this.canvas['requestFullscreen'](); // HTML5 Fullscreen API仕様
+    } else {
+      // alert('ご利用のブラウザはフルスクリーン操作に対応していません');
+      return;
+    }
+  }
 
   public set_window_size(width: number, height: number) {
     this.width = width;
@@ -367,3 +380,5 @@ const shapeFunc = (code: Code, options: {}) => {
   }
   return shapeFuncMap['unknown'];
 };
+
+export const puppy: Puppy = new Puppy();
