@@ -5,7 +5,7 @@ module.exports = {
   // development に設定するとソースマップ有効でJSファイルが出力される
   mode: 'development',
   // メインとなるJavaScriptファイル（エントリーポイント）
-  entry: './src/editor.ts',
+  entry: './src/controller/controller.ts',
 
   target: 'node',
 
