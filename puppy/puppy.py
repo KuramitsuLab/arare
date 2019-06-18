@@ -23,7 +23,7 @@ window['PuppyVMCode'] = {{
   }},
   bodies: [],
   main: function(Matter,puppy){{
-    {main}
+{main}
   }},
   errors: []
 }}
@@ -37,7 +37,7 @@ window['PuppyVMCode'] = {{
 def Source(t):
     s = ''
     for label, subtree in t:
-        s += conv(subtree) + '\n'
+        s += Indent(conv(subtree))
     return puppyVMCode(s)
 
 
@@ -46,9 +46,53 @@ def VarDecl(t):
     right = conv(t['right'])
     return '{} = {}'.format(left, right)
 
+option = [
+    'position',
+    'Ball',
+]
+
+render = [
+    'fillStyle',
+    'strokeStyle',
+    'lineWidth',
+]
+
+def KeywordArgument(t):
+    name = conv(t['name'])
+    value = conv(t['value'])
+    if name in option:
+        return "'{}' : {{\n{}}},\n".format(name,Indent(value))
+    if name in render:
+        return "'render' : {{\n'{}' : {},\n}},\n".format(name, value)  #renderを一回にしたい
+    return "'{}' : {},\n".format(name, value)
+      
+
+def Data(t):
+    s = ''
+    for label, subtree in t:
+        s += conv(subtree)
+    return s
+
+def KeyValue(t):
+    name = conv(t['name'])
+    value = conv(t['value'])
+    return "{} : {},\n".format(name, value)
+
 def Name(t):
     return t.asString()
 
+def Int(t):
+    return t.asString()
+
+def String(t):
+    return "'{}'".format(t.asString())
+
+def Indent(t):
+    a = t.splitlines()
+    s = ""
+    for i in a:
+        s += "    " + i + "\n"
+    return s
 
 cheepna = {
     'print': 'puppy.print(',
@@ -58,9 +102,16 @@ cheepna = {
 
 def ApplyExpr(t):
     name = conv(t['name'])
+    s = ""
+    for label, subtree in t:
+        if subtree.tag == "Name":
+            continue
+        s += conv(subtree)      
     if name in cheepna:
-        return cheepna[name] + '{})'
-    return name + '(TODO)'
+        if name in option:
+            return "{}{{\n{}}}),\n".format(cheepna[name],Indent(s))
+        return "{}{}),\n".format(cheepna[name],s)
+    return s
 
 
 def IfStmt(t):
